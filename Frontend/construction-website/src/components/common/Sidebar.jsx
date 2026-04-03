@@ -10,7 +10,7 @@ const Sidebar = () => {
     "text-slate-600 hover:bg-slate-100 hover:text-blue-600";
 
   return (
-    <div className="w-64 min-h-screen bg-blue-400 backdrop-blur-xl border-r border-slate-200/60 p-5">
+    <div className="w-64 min-h-full bg-blue-400 backdrop-blur-xl border-r border-slate-200/60 p-5">
 
       {/* Logo */}
       <h2 className="text-lg font-semibold text-blue-700 mb-8 tracking-tight">
