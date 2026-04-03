@@ -1,11 +1,11 @@
 import React from 'react'
 
-const Header = () => {
+const LogsPage = () => {
   return (
     <div>
-      
+      LOgspage
     </div>
   )
 }
 
-export default Header
+export default LogsPage
