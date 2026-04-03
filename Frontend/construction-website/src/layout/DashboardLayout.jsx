@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+import { Outlet } from "react-router-dom"; // ← add this
 import Header from "../components/common/Header";
 import Sidebar from "../components/common/Sidebar";
 
-const DashboardLayout = ({ children }) => {
+const DashboardLayout = () => {  // ← remove { children }
   const [open, setOpen] = useState(false);
 
   const user = {
@@ -33,15 +34,14 @@ const DashboardLayout = ({ children }) => {
 
       {/* Main */}
       <div className="flex-1">
-
-        {/* Header */}
         <Header 
           toggleSidebar={() => setOpen(true)} 
           user={user}
         />
 
-        <div className="p-6">{children}</div>
-
+        <div className="p-6">
+          <Outlet /> {/* ← replace {children} with this */}
+        </div>
       </div>
     </div>
   );

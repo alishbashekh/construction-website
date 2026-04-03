@@ -1,12 +1,11 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute, PublicRoute } from "./components/RouteGuards";
 import RegisterPage from "./pages/auth/RegisterPage";
 import LoginPage from "./pages/auth/LoginPage";
 import DashboardLayout from "./layout/DashboardLayout";
 import Dashboard from "./pages/General/Dashboard";
-import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import UserPage from "./pages/General/UserPage";
 import LogsPage from "./pages/General/LogsPage";
 import BookingsPage from "./pages/apartmentBookings/BookingsPage";
@@ -20,7 +19,10 @@ const App = () => {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          {/* Redirect root to login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
+
+          {/* Public Routes */}
           <Route
             path="/login"
             element={
@@ -37,39 +39,30 @@ const App = () => {
               </PublicRoute>
             }
           />
+
+          {/* Protected Routes */}
           <Route
-            path="/dashboard"
+            path="/"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <DashboardLayout />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="users" element={<UserPage />} />
+            <Route path="logs" element={<LogsPage />} />
+            <Route path="projects" element={<ProjectsPage />} />
+            <Route path="flats" element={<FlatsPage />} />
+            <Route path="clients" element={<ClientsPage />} />
+            <Route path="bookings" element={<BookingsPage />} />
+            <Route path="payments" element={<ClientPayments />} />
+          </Route>
+
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          {/* General */}
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="users" element={<UserPage />} />
-          <Route path="logs" element={<LogsPage />} />
-
-          {/* Apartment Bookings */}
-          <Route path="projects" element={<ProjectsPage />} />
-          <Route path="flats" element={<FlatsPage />} />
-          <Route path="clients" element={<ClientsPage />} />
-          <Route path="bookings" element={<BookingsPage />} />
-          <Route path="payments" element={<ClientPayments />} />
-        </Route>
-      </Routes>
     </BrowserRouter>
   );
 };
