@@ -11,10 +11,10 @@ const DashboardLayout = ({ children }) => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       
       {/* Desktop Sidebar */}
-      <div className="hidden md:block">
+      <div className="hidden md:block sticky top-0 h-screen">
         <Sidebar />
       </div>
 
