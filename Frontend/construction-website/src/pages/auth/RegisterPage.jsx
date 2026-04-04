@@ -8,8 +8,8 @@ import {
   PrimaryButton,
   Alert,
   AuthCard,
-} from "../../components/UI";
-import { PasswordStrengthMeter } from "../../components/PasswordStrengthMeter";
+} from "../../components/common/UI";
+import { PasswordStrengthMeter } from "../../components/common/PasswordStrengthMeter";
 import {
   getPasswordStrength,
   isPasswordValid,

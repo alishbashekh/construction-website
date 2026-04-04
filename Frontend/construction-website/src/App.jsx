@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import { ProtectedRoute, PublicRoute } from "./components/RouteGuards";
+import { ProtectedRoute, PublicRoute } from "./components/common/RouteGuards";
 import RegisterPage from "./pages/auth/RegisterPage";
 import LoginPage from "./pages/auth/LoginPage";
 import DashboardLayout from "./layout/DashboardLayout";

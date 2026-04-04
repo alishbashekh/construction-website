@@ -8,7 +8,7 @@ import {
   PrimaryButton,
   Alert,
   AuthCard,
-} from "../../components/UI";
+} from "../../components/common/UI";
 import { ForgotPasswordModal } from "../../components/Modal/ForgetPasswordModal";
 
 const LoginPage = () => {

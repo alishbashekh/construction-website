@@ -3,7 +3,7 @@ import {
   validatePassword,
   getPasswordStrength,
   PASSWORD_RULES,
-} from "../utils/passwordUtils";
+} from "../../utils/passwordUtils";
 
 /**
  * PasswordStrengthMeter — shows 4 strength bars + rule checklist.
