@@ -1,30 +1,26 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-
+import Logo from "../../assets/images/logo.png";
 const Sidebar = () => {
   const baseClass =
-    "flex items-center px-3 py-2 rounded-xl transition cursor-pointer";
+    "flex items-center px-3 py-2.5 rounded-xl transition cursor-pointer";
 
-  const activeClass = "bg-blue-50 text-blue-600 font-medium";
-  const inactiveClass =
-    "text-slate-600 hover:bg-slate-100 hover:text-blue-600";
+  const activeClass = "bg-[var(--accent)]  text-white font-bold";
+  const inactiveClass = "text-slate-200 hover:bg-slate-100 hover:text-[var(--accent)]";
 
   return (
-    <div className="w-64 min-h-full bg-blue-400 backdrop-blur-xl border-r border-slate-200/60 p-5">
-
+    <div className="w-64 min-h-full bg-[var(--color-primary)] backdrop-blur-xl border-r border-slate-200/60 p-5">
       {/* Logo */}
-      <h2 className="text-lg font-semibold text-blue-700 mb-8 tracking-tight">
-        OTTOMAN CONSTRUCTION
-      </h2>
-       <hr className="mb-2 text-slate-400"/>
+
+      <img src={Logo} className="w-36 h-23 mx-auto " />
+      <hr className="mb-2 text-slate-400" />
       {/* General */}
       <div className="mb-6">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+        <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">
           General
         </p>
 
         <ul className="space-y-1 text-sm">
-
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
@@ -51,18 +47,16 @@ const Sidebar = () => {
           >
             Logs
           </NavLink>
-
         </ul>
       </div>
 
       {/* Apartment Bookings */}
       <div>
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+        <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">
           Apartment Bookings
         </p>
 
         <ul className="space-y-1 text-sm font-bold">
-
           <NavLink
             to="/projects"
             className={({ isActive }) =>
@@ -107,10 +101,8 @@ const Sidebar = () => {
           >
             Client Payments
           </NavLink>
-
         </ul>
       </div>
-
     </div>
   );
 };

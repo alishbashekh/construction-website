@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 //  if user is authenticated then go to pages other wise redirect to login
 export function ProtectedRoute({ children }) {

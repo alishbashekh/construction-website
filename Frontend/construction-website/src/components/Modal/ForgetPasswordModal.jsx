@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { InputField, PrimaryButton, Alert } from "../UI";
+import { InputField, PrimaryButton, Alert } from "../common/UI";
 
 export function ForgotPasswordModal({ onClose }) {
   const { sendPasswordReset } = useAuth();
