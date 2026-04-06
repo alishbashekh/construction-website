@@ -92,7 +92,7 @@ const RegisterPage = () => {
   const canSubmit = passwordStrong && !loading;
 
   return (
-    <div className="auth-bg min-h-screen flex items-center justify-center p-4 py-10">
+    <div className="auth-bg min-h-screen flex items-center justify-center p-4 py-10 bg-[var(--accent)]">
       <div className="relative z-10 w-full max-w-md">
         <AuthCard>
           <div className="flex justify-center mb-5">
