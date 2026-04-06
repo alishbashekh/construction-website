@@ -134,17 +134,6 @@ const LoginPage = () => {
               </Link>
             </p>
           </AuthCard>
-
-          <p className="text-center text-white/50 text-xs mt-4">
-            New here?{" "}
-            <Link
-              to="/register"
-              className="text-white/70 underline underline-offset-2"
-            >
-              Create a free account
-            </Link>{" "}
-            to get started.
-          </p>
         </div>
       </div>
       {showForgot && (
