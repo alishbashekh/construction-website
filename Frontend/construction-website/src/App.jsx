@@ -24,10 +24,7 @@ const App = () => {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Redirect root to login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
-
-          {/* Public Routes */}
           <Route
             path="/login"
             element={
@@ -44,8 +41,6 @@ const App = () => {
               </PublicRoute>
             }
           />
-
-          {/* Protected Routes */}
           <Route
             path="/"
             element={
@@ -75,7 +70,6 @@ const App = () => {
             <Route path="/reports/client-ledger" element={<ClientLedger />} />
           </Route>
 
-          {/* Fallback */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>

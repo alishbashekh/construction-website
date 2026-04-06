@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../../assets/images/logo.png";
-
-/* ── Icons ── */
 const Icons = {
   dashboard: (
     <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -85,7 +83,8 @@ const REPORT_LINKS = [
   { to: "/reports/client-ledger", label: "Client Ledger" },
 ];
 
-const base = "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 cursor-pointer text-sm font-bold w-full";
+const base =
+  "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 cursor-pointer text-sm font-bold w-full";
 const active = "bg-[#1a6fa8] text-white";
 const inactive = "text-slate-200 hover:bg-white/10 hover:text-white";
 
@@ -166,86 +165,124 @@ export default function Sidebar({ onLogout }) {
 };
 
   return (
-    <>
-      {showLogoutModal && (
-        <LogoutModal
-          onConfirm={handleLogoutConfirm}
-          onCancel={() => setShowLogoutModal(false)}
-        />
-      )}
-
-      <div className="w-64 h-screen bg-[#0f3a5c] flex flex-col border-r border-white/10">
-        {/* Logo */}
-        <div className="px-5 pt-5 pb-4">
-          <div className="flex justify-center mb-4">
+    <div className="w-64 min-h-full bg-[#0f3a5c] flex flex-col border-r border-white/10">
+      <div className="px-5 pt-5 pb-4">
+        <div className="flex justify-center mb-4">
+          <div className="flex items-center justify-center">
             <img src={Logo} alt="Logo" className="w-36 h-auto mx-auto" />
           </div>
           <hr className="border-white/20" />
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 px-4 pb-4 overflow-y-auto flex flex-col gap-6 sidebar-scroll">
-          {/* ── GENERAL ── */}
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">General</p>
-            <ul className="space-y-0.5">
-              <li>
-                <NavLink to="/dashboard" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
-                  {Icons.dashboard} Dashboard
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/users" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
-                  {Icons.users} Users
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/logs" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
-                  {Icons.logs} Logs
-                </NavLink>
-              </li>
-            </ul>
-          </div>
+      <nav className="flex-1 px-4 pb-4 overflow-y-auto flex flex-col gap-6">
+        <div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">
+            General
+          </p>
+          <ul className="space-y-0.5">
+            <li>
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
+                {Icons.dashboard} Dashboard
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/users"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
+                {Icons.users} Users
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/logs"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
+                {Icons.logs} Logs
+              </NavLink>
+            </li>
+          </ul>
+        </div>
 
-          {/* ── APARTMENT BOOKINGS ── */}
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Apartment Bookings</p>
-            <ul className="space-y-0.5">
-              <li>
-                <NavLink to="/projects" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
-                  {Icons.projects} Projects
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/flats" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
-                  {Icons.flats} Flats / Units
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/clients" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
-                  {Icons.clients} Clients
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/bookings" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
-                  {Icons.bookings} Bookings
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/payments" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
-                  {Icons.payments} Client Payments
-                </NavLink>
-              </li>
-            </ul>
-          </div>
+        <div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">
+            Apartment Bookings
+          </p>
+          <ul className="space-y-0.5">
+            <li>
+              <NavLink
+                to="/projects"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
+                {Icons.projects} Projects
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/flats"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
+                {Icons.flats} Flats / Units
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/clients"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
+                {Icons.clients} Clients
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/bookings"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
+                {Icons.bookings} Bookings
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/payments"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
+                {Icons.payments} Client Payments
+              </NavLink>
+            </li>
+          </ul>
+        </div>
 
-          {/* ── CLIENT REPORTS (accordion) ── */}
-          <div>
-            <ul className="space-y-0.5">
-              <li>
-                <button
-                  onClick={() => setReportsOpen((o) => !o)}
-                  className={`${base} ${isReportActive ? active : inactive} justify-between`}
+        <div>
+          <ul className="space-y-0.5">
+            <li>
+              <button
+                onClick={() => setReportsOpen((o) => !o)}
+                className={`${base} ${isReportActive ? active : inactive} justify-between`}
+              >
+                <span className="flex items-center gap-3">
+                  {Icons.reports} Client Reports
+                </span>
+                <span
+                  className={`transition-transform duration-200 ${reportsOpen ? "rotate-180" : ""}`}
                 >
                   <span className="flex items-center gap-3">{Icons.reports} Client Reports</span>
                   <span className={`transition-transform duration-200 ${reportsOpen ? "rotate-180" : ""}`}>
@@ -275,16 +312,39 @@ export default function Sidebar({ onLogout }) {
           </div>
         </nav>
 
-        {/* ── Log out ── */}
-        <div className="px-4 py-4 border-t border-white/10">
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-[#1a6fa8] hover:bg-[#155d8f] text-white text-sm font-bold transition-all"
-          >
-            {Icons.logout}
-            Log out
-          </button>
+              {reportsOpen && (
+                <ul className="mt-0.5 ml-4 border-l border-white/15 pl-3 space-y-0.5">
+                  {REPORT_LINKS.map((link) => (
+                    <li key={link.to}>
+                      <NavLink
+                        to={link.to}
+                        className={({ isActive }) =>
+                          `block px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 ${
+                            isActive
+                              ? "bg-[#1a6fa8] text-white"
+                              : "text-slate-300 hover:bg-white/10 hover:text-white"
+                          }`
+                        }
+                      >
+                        {link.label}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          </ul>
         </div>
+      </nav>
+
+      <div className="px-4 py-4 border-t border-white/10">
+        <button
+          onClick={onLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-[#1a6fa8] hover:bg-[#155d8f] text-white text-sm font-bold transition-all"
+        >
+          {Icons.logout}
+          Log out
+        </button>
       </div>
     </>
   );

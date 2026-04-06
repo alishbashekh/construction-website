@@ -1,12 +1,10 @@
 import { useState } from 'react';
 
-/* ── shared select / date input styles ── */
 const SEL = "appearance-none pl-4 pr-10 py-[11px] rounded-lg border border-slate-200 bg-white text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 cursor-pointer w-full";
 const DATE_IN = "px-4 py-[11px] rounded-lg border border-slate-200 bg-white text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 w-full";
 
 const PROJECTS = ['Ottoman Heights','Cevher','Green Valley'];
 
-/* booking rows – all amounts in PKR */
 const ALL_BOOKINGS = [
   { id:'BKG-00012', project:'Ottoman Heights', unit:'108', client:'Sameer Shaikh',  cnic:'41302-2469092-7', date:'31/03/2026', price:3000000,   paid:50000    },
   { id:'BKG-00011', project:'Ottoman Heights', unit:'401', client:'Samantha Hurst', cnic:'23132-1312312-2', date:'31/03/2026', price:5000000,   paid:50000    },
@@ -123,7 +121,6 @@ export default function SalesSummary() {
         <p className="text-sm text-slate-500 mt-0.5">Project-wise sales overview based on bookings</p>
       </div>
 
-      {/* Filter bar */}
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col gap-1.5 min-w-[200px]">
           <label className="text-sm font-semibold text-slate-700">Project <span className="text-slate-400 font-normal">(Optional)</span></label>
@@ -152,7 +149,6 @@ export default function SalesSummary() {
         <div className="bg-white rounded-xl border border-slate-200 py-20 text-center text-slate-400 text-sm">No data found</div>
       ) : (
         <>
-          {/* Summary cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <SummaryCard label="Total Bookings Price"  value={fmt(totalPrice)}       />
             <SummaryCard label="Total Paid"            value={fmt(totalPaid)}        color="text-emerald-600"/>
@@ -160,7 +156,6 @@ export default function SalesSummary() {
             <SummaryCard label="Total Bookings"        value={results.length}        />
           </div>
 
-          {/* Search */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="relative w-72">
@@ -198,7 +193,6 @@ export default function SalesSummary() {
               </table>
             </div>
 
-            {/* Pagination */}
             <div className="flex items-center justify-between px-5 py-3.5 border-t border-slate-100 flex-wrap gap-3">
               <p className="text-xs text-slate-500">
                 Showing {sorted.length===0?0:(safePage-1)*PER+1}–{Math.min(safePage*PER,sorted.length)} of {sorted.length} results

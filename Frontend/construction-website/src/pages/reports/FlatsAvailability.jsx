@@ -219,7 +219,6 @@ export default function FlatsAvailability() {
         </p>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col gap-1.5 min-w-[200px]">
           <label className="text-sm font-semibold text-slate-700">
