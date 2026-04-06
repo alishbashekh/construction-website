@@ -13,6 +13,11 @@ import ClientPayments from "./pages/apartmentBookings/ClientPayments";
 import ClientsPage from "./pages/apartmentBookings/ClientsPage";
 import FlatsPage from "./pages/apartmentBookings/FlatsPage";
 import ProjectsPage from "./pages/apartmentBookings/ProjectsPage";
+import SalesSummary from "./pages/reports/SalesSummary";
+import FlatsAvailability from "./pages/reports/FlatsAvailability";
+import ClientDues from "./pages/reports/ClientDues";
+import PaymentCollection from "./pages/reports/PaymentCollection";
+import ClientLedger from "./pages/reports/ClientLedger";
 
 const App = () => {
   return (
@@ -57,6 +62,17 @@ const App = () => {
             <Route path="clients" element={<ClientsPage />} />
             <Route path="bookings" element={<BookingsPage />} />
             <Route path="payments" element={<ClientPayments />} />
+            <Route path="/reports/sales-summary" element={<SalesSummary />} />
+            <Route
+              path="/reports/flats-availability"
+              element={<FlatsAvailability />}
+            />
+            <Route path="/reports/client-dues" element={<ClientDues />} />
+            <Route
+              path="/reports/payment-collection"
+              element={<PaymentCollection />}
+            />
+            <Route path="/reports/client-ledger" element={<ClientLedger />} />
           </Route>
 
           {/* Fallback */}
