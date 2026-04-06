@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import Logo from "../../assets/images/logo.png";
-/* ── Icons ── */
 const Icons = {
   dashboard: (
     <svg
@@ -213,7 +212,6 @@ const REPORT_LINKS = [
   { to: "/reports/client-ledger", label: "Client Ledger" },
 ];
 
-/* shared link style helpers */
 const base =
   "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 cursor-pointer text-sm font-bold w-full";
 const active = "bg-[#1a6fa8] text-white";
@@ -228,9 +226,7 @@ export default function Sidebar({ onLogout }) {
 
   return (
     <div className="w-64 min-h-full bg-[#0f3a5c] flex flex-col border-r border-white/10">
-      {/* Logo */}
       <div className="px-5 pt-5 pb-4">
-        {/* SVG logo matching Ottoman Construction branding */}
         <div className="flex justify-center mb-4">
           <div className="flex items-center justify-center">
             <img src={Logo} alt="Logo" className="w-36 h-auto mx-auto" />
@@ -239,9 +235,7 @@ export default function Sidebar({ onLogout }) {
         <hr className="border-white/20" />
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 px-4 pb-4 overflow-y-auto flex flex-col gap-6">
-        {/* ── GENERAL ── */}
         <div>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">
             General
@@ -280,7 +274,6 @@ export default function Sidebar({ onLogout }) {
           </ul>
         </div>
 
-        {/* ── APARTMENT BOOKINGS ── */}
         <div>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">
             Apartment Bookings
@@ -339,12 +332,9 @@ export default function Sidebar({ onLogout }) {
           </ul>
         </div>
 
-        {/* ── CLIENT REPORTS (accordion) ── */}
         <div>
-          {/* No section label — sits directly in nav */}
           <ul className="space-y-0.5">
             <li>
-              {/* Accordion trigger */}
               <button
                 onClick={() => setReportsOpen((o) => !o)}
                 className={`${base} ${isReportActive ? active : inactive} justify-between`}
@@ -359,7 +349,6 @@ export default function Sidebar({ onLogout }) {
                 </span>
               </button>
 
-              {/* Sub-links */}
               {reportsOpen && (
                 <ul className="mt-0.5 ml-4 border-l border-white/15 pl-3 space-y-0.5">
                   {REPORT_LINKS.map((link) => (
@@ -385,7 +374,6 @@ export default function Sidebar({ onLogout }) {
         </div>
       </nav>
 
-      {/* ── Log out ── */}
       <div className="px-4 py-4 border-t border-white/10">
         <button
           onClick={onLogout}

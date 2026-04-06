@@ -222,7 +222,6 @@ export default function ClientDues() {
         </p>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col gap-1.5 min-w-[200px]">
           <label className="text-sm font-semibold text-slate-700">
@@ -259,7 +258,6 @@ export default function ClientDues() {
         </div>
       ) : (
         <>
-          {/* Summary cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white rounded-xl border border-slate-200 px-6 py-5">
               <p className="text-sm text-slate-500">Total Booking Price</p>
@@ -281,7 +279,6 @@ export default function ClientDues() {
             </div>
           </div>
 
-          {/* Table */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
