@@ -16,19 +16,19 @@ import {
   AlertCircle
 } from "lucide-react";
 const REPORT_ROUTES = [
-  "#/reports/sales-summary",
-  "#/reports/flats-availability",
-  "#/reports/client-dues",
-  "#/reports/payment-collection",
-  "#/reports/client-ledger",
+  "/reports/sales-summary",
+  "/reports/flats-availability",
+  "/reports/client-dues",
+  "/reports/payment-collection",
+  "/reports/client-ledger",
 ];
 
 const REPORT_LINKS = [
-  { to: "#/reports/sales-summary", label: "Sales Summary" },
-  { to: "#/reports/flats-availability", label: "Flats Availability" },
-  { to: "#/reports/client-dues", label: "Client Dues" },
-  { to: "#/reports/payment-collection", label: "Payment Collection" },
-  { to: "#/reports/client-ledger", label: "Client Ledger" },
+  { to: "/reports/sales-summary", label: "Sales Summary" },
+  { to: "/reports/flats-availability", label: "Flats Availability" },
+  { to: "/reports/client-dues", label: "Client Dues" },
+  { to: "/reports/payment-collection", label: "Payment Collection" },
+  { to: "/reports/client-ledger", label: "Client Ledger" },
 ];
 
 const base = "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 cursor-pointer text-sm font-bold w-full";
@@ -90,7 +90,7 @@ export default function Sidebar({ onLogout }) {
     localStorage.clear();
     sessionStorage.clear();
     if (onLogout) onLogout();
-    window.location.href = "#/login";
+    window.location.href = "/login";
   };
 
   return (
@@ -108,17 +108,17 @@ export default function Sidebar({ onLogout }) {
           </p>
           <ul className="space-y-0.5">
             <li>
-              <NavLink to="#/dashboard" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink to="/dashboard" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
                 <LayoutDashboard size={20} /> Dashboard
               </NavLink>
             </li>
             <li>
-              <NavLink to="#/users" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink to="/users" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
                 <Users size={20} /> Users
               </NavLink>
             </li>
             <li>
-              <NavLink to="#/logs" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink to="/logs" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
                 <FileText size={20} /> Logs
               </NavLink>
             </li>
@@ -132,27 +132,27 @@ export default function Sidebar({ onLogout }) {
           </p>
           <ul className="space-y-0.5">
             <li>
-              <NavLink to="#/projects" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink to="/projects" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
                 <Folder size={20} /> Projects
               </NavLink>
             </li>
             <li>
-              <NavLink to="#/flats" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink to="/flats" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
                 <Home size={20} /> Flats / Units
               </NavLink>
             </li>
             <li>
-              <NavLink to="#/clients" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink to="/clients" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
                 <User size={20} /> Clients
               </NavLink>
             </li>
             <li>
-              <NavLink to="#/bookings" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink to="/bookings" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
                 <Calendar size={20} /> Bookings
               </NavLink>
             </li>
             <li>
-              <NavLink to="#/payments" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink to="/payments" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
                 <CreditCard size={20} /> Client Payments
               </NavLink>
             </li>
