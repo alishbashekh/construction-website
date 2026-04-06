@@ -40,7 +40,7 @@ const DashboardLayout = () => {  // ← remove { children }
         />
 
         <div className="p-6">
-          <Outlet /> {/* ← replace {children} with this */}
+          <Outlet /> 
         </div>
       </div>
     </div>
