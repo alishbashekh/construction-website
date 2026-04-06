@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute, PublicRoute } from "./components/common/RouteGuards";
 import RegisterPage from "./pages/auth/RegisterPage";
@@ -21,10 +21,13 @@ import ClientLedger from "./pages/reports/ClientLedger";
 
 const App = () => {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AuthProvider>
         <Routes>
+          {/* Redirect root to login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
+
+          {/* Public Routes */}
           <Route
             path="/login"
             element={
@@ -41,6 +44,8 @@ const App = () => {
               </PublicRoute>
             }
           />
+
+          {/* Protected Routes */}
           <Route
             path="/"
             element={
@@ -57,23 +62,20 @@ const App = () => {
             <Route path="clients" element={<ClientsPage />} />
             <Route path="bookings" element={<BookingsPage />} />
             <Route path="payments" element={<ClientPayments />} />
-            <Route path="/reports/sales-summary" element={<SalesSummary />} />
-            <Route
-              path="/reports/flats-availability"
-              element={<FlatsAvailability />}
-            />
-            <Route path="/reports/client-dues" element={<ClientDues />} />
-            <Route
-              path="/reports/payment-collection"
-              element={<PaymentCollection />}
-            />
-            <Route path="/reports/client-ledger" element={<ClientLedger />} />
+
+            {/* Reports */}
+            <Route path="reports/sales-summary" element={<SalesSummary />} />
+            <Route path="reports/flats-availability" element={<FlatsAvailability />} />
+            <Route path="reports/client-dues" element={<ClientDues />} />
+            <Route path="reports/payment-collection" element={<PaymentCollection />} />
+            <Route path="reports/client-ledger" element={<ClientLedger />} />
           </Route>
 
+          {/* Catch-all redirect */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
