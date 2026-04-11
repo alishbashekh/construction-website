@@ -1,0 +1,178 @@
+import getVendorModel from "../../models/Vendor.js";
+import getVendorPaymentModel from "../../models/VendorPayment.js";
+import BaseController from "../BaseController.js";
+import { createAuditLog } from "../../utils/auditLog.js";
+
+class VendorController extends BaseController {
+  // 1. Naya Vendor register karna
+  create = async (req, res, next) => {
+    try {
+      const Vendor = getVendorModel();
+      const { name, category, phone } = req.body;
+
+      // Check karo: Kya naam, category aur phone number diya hai?
+      if (!name || !category || !phone)
+        return res
+          .status(400)
+          .json({ message: "Zaroori details missing hain!" });
+
+      // Duplicate Check: Kahin is naam ya phone ka banda pehle se list mein toh nahi?
+      const existing = await Vendor.findOne({
+        deletedAt: null,
+        $or: [{ name }, { phone }],
+      });
+      if (existing)
+        return res
+          .status(400)
+          .json({ message: "Is naam ya phone ka vendor pehle se majood hai!" });
+
+      // Database mein save karo
+      const vendor = await Vendor.create({
+        ...req.body,
+        createdBy: req.user._id,
+      });
+
+      // Audit Log: Diary mein likho ke naya vendor add hua
+      await createAuditLog({
+        action: "vendor_create",
+        description: `Vendor ${name} add kiya gaya`,
+        req,
+      });
+
+      return res
+        .status(201)
+        .json({ error: false, message: "Vendor ban gaya!", data: vendor });
+    } catch (error) {
+      return this.handleError(next, error.message, 500);
+    }
+  };
+
+  // 2. Sab Vendors ki list dekhna
+  getAll = async (req, res, next) => {
+    try {
+      const Vendor = getVendorModel();
+      const { page = 1, limit = 10, search } = req.query;
+      let query = { deletedAt: null };
+
+      // Search: Naam ya phone se dhoondo
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
+        ];
+      }
+
+      const vendors = await Vendor.find(query)
+        .sort({ createdAt: -1 })
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+
+      const total = await Vendor.countDocuments(query);
+
+      return res.status(200).json({ data: vendors, total });
+    } catch (error) {
+      return this.handleError(next, error.message, 500);
+    }
+  };
+
+  // 3. Ek Vendor ki poori detail aur uski payments (Get By ID)
+  getById = async (req, res, next) => {
+    try {
+      const Vendor = getVendorModel();
+      const VendorPayment = getVendorPaymentModel();
+
+      const vendor = await Vendor.findOne({
+        _id: req.params.id,
+        deletedAt: null,
+      });
+      if (!vendor) return res.status(404).json({ message: "Vendor nahi mila" });
+
+      // Is vendor ki saari payments dhoondo
+      const payments = await VendorPayment.find({
+        vendor: vendor._id,
+        deletedAt: null,
+      }).populate("project", "name");
+
+      // Maths: Total kitne paise diye aur kitni adjustment hui
+      const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+      const totalAdjustment = payments.reduce(
+        (sum, p) => sum + (p.adjustment || 0),
+        0,
+      );
+
+      return res.status(200).json({
+        data: {
+          ...vendor.toJSON(),
+          payments,
+          summary: {
+            totalPaid,
+            totalAdjustment,
+            netPaid: totalPaid - totalAdjustment,
+          },
+        },
+      });
+    } catch (error) {
+      return this.handleError(next, error.message, 500);
+    }
+  };
+
+  // 4. Vendor ki info badalna (Update)
+  update = async (req, res, next) => {
+    try {
+      const Vendor = getVendorModel();
+      const vendor = await Vendor.findOne({
+        _id: req.params.id,
+        deletedAt: null,
+      });
+      if (!vendor) return res.status(404).json({ message: "Vendor nahi mila" });
+
+      // Agar naam ya phone change ho raha hai, toh check karo naya wala kisi aur ka toh nahi?
+      const { name, phone } = req.body;
+      if (name || phone) {
+        const duplicate = await Vendor.findOne({
+          _id: { $ne: vendor._id },
+          deletedAt: null,
+          $or: [{ name }, { phone }],
+        });
+        if (duplicate)
+          return res
+            .status(400)
+            .json({ message: "Naya naam ya phone pehle se use mein hai!" });
+      }
+
+      // Update karo
+      Object.assign(vendor, req.body);
+      await vendor.save();
+
+      return res
+        .status(200)
+        .json({ message: "Vendor update ho gaya!", data: vendor });
+    } catch (error) {
+      return this.handleError(next, error.message, 500);
+    }
+  };
+
+  // 5. Vendor nikaal dena (Soft Delete)
+  delete = async (req, res, next) => {
+    try {
+      const Vendor = getVendorModel();
+      await Vendor.updateOne({ _id: req.params.id }, { deletedAt: new Date() });
+      return res.status(200).json({ message: "Vendor delete kar diya gaya" });
+    } catch (error) {
+      return this.handleError(next, error.message, 500);
+    }
+  };
+
+  // 6. Delete kiye hue vendor ko wapas lana (Restore)
+  restore = async (req, res, next) => {
+    try {
+      const Vendor = getVendorModel();
+      await Vendor.updateOne({ _id: req.params.id }, { deletedAt: null });
+      return res.status(200).json({ message: "Vendor wapas aa gaya!" });
+    } catch (error) {
+      return this.handleError(next, error.message, 500);
+    }
+  };
+}
+
+export default new VendorController();
