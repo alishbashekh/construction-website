@@ -1,5 +1,5 @@
 import { Router } from "express";
-import FlatController from "../../../../controllers/project/flatController.js";
+import FlatController from "../../../../controllers/Flat/flatController.js";
 import isUser from "../../../../middlewares/isUser.js";
 import checkRole from "../../../../middlewares/checkRole.js";
 

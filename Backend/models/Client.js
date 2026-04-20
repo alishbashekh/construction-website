@@ -25,26 +25,21 @@ const ClientSchema = new mongoose.Schema(
 
 ClientSchema.index({ cnic: 1, deletedAt: 1 }, { unique: true });
 
-ClientSchema.pre('save', async function (next) {
-  try {
-    if (this.clientId) return next();
+// ✅ Fixed: removed next parameter — async hooks handle errors via thrown exceptions
+ClientSchema.pre('save', async function () {
+  if (this.clientId) return;
 
-    const Client = mongoose.model('Client');
-    let isUnique = false;
+  const Client = mongoose.model('Client');
+  let isUnique = false;
 
-    while (!isUnique) {
-      const count = await Client.countDocuments();
-      const candidate = `CLT-${String(count + 1).padStart(5, '0')}`;
-      const existing = await Client.findOne({ clientId: candidate }).select('_id');
-      if (!existing) {
-        this.clientId = candidate;
-        isUnique = true;
-      }
+  while (!isUnique) {
+    const count = await Client.countDocuments();
+    const candidate = `CLT-${String(count + 1).padStart(5, '0')}`;
+    const existing = await Client.findOne({ clientId: candidate }).select('_id');
+    if (!existing) {
+      this.clientId = candidate;
+      isUnique = true;
     }
-
-    next();
-  } catch (error) {
-    next(error);
   }
 });
 

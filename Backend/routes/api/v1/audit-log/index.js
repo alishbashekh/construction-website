@@ -1,5 +1,5 @@
 import { Router } from "express";
-import AuditLogController from "../../../../controllers/system/auditLogController.js";
+import AuditLogController from "../../../../controllers/auditLog/auditLogController.js";
 import isUser from "../../../../middlewares/isUser.js";
 import checkRole from "../../../../middlewares/checkRole.js";
 

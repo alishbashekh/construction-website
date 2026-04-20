@@ -1,60 +1,50 @@
-import getVendorProjectModel from "../../models/VendorProject.js";
+import VendorProject from "../../models/VendorProject.js";
 import BaseController from "../BaseController.js";
 import { createAuditLog } from "../../utils/auditLog.js";
 
 class VendorProjectController extends BaseController {
-  // 1. Naya Vendor Project banana (Create)
+  // 1. Create new vendor project
   create = async (req, res, next) => {
     try {
-      const VendorProject = getVendorProjectModel();
-
-      // Check karo: Kya project ka naam likha hai?
       const { name } = req.body;
-      if (!name)
-        return res.status(400).json({ message: "Project ka naam lazmi hai!" });
 
-      // Check karo: Kahin is naam ka project pehle se toh nahi bana hua?
+      if (!name)
+        return res.status(400).json({ message: "Project name is required!" });
+
       const existing = await VendorProject.findOne({ name, deletedAt: null });
       if (existing)
-        return res
-          .status(400)
-          .json({ message: "Is naam ka project pehle se majood hai!" });
+        return res.status(400).json({ message: "Project with this name already exists!" });
 
-      // Database mein save karo
       const project = await VendorProject.create({
         ...req.body,
-        createdBy: req.user._id,
+        createdBy: req.user.id, // ✅ fixed
       });
 
-      // Audit Log: Diary mein entry ke naya project ban gaya
       await createAuditLog({
-        action: "vendor_project_create",
-        description: `Naya vendor project "${name}" banaya`,
+        performedBy:   req.user.id,          // ✅ fixed
+        performerRole: req.user.accountType, // ✅ fixed
+        action:        "vendor_project_create",
+        category:      "vendor",
+        targetModel:   "VendorProject",
+        targetId:      project._id,
+        description:   `Vendor project "${name}" created`,
         req,
       });
 
-      return res
-        .status(201)
-        .json({
-          error: false,
-          message: "Vendor project ban gaya!",
-          data: project,
-        });
+      return res.status(201).json({ error: false, message: "Vendor project created!", data: project });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   };
 
-  // 2. Sab Projects ki list dekhna (Get All)
+  // 2. Get all projects
   getAll = async (req, res, next) => {
     try {
-      const VendorProject = getVendorProjectModel();
       const { page = 1, limit = 10, search, status } = req.query;
 
-      let query = { deletedAt: null }; // Sirf wo dikhao jo delete nahi hue
-
+      let query = { deletedAt: null };
       if (status) query.status = status;
-      if (search) query.name = { $regex: search, $options: "i" }; // Search feature
+      if (search) query.name   = { $regex: search, $options: "i" };
 
       const projects = await VendorProject.find(query)
         .sort({ createdAt: -1 })
@@ -69,17 +59,16 @@ class VendorProjectController extends BaseController {
     }
   };
 
-  // 3. Ek Project ki detail dekhna (Get By ID)
+  // 3. Get single project
   getById = async (req, res, next) => {
     try {
-      const VendorProject = getVendorProjectModel();
       const project = await VendorProject.findOne({
-        _id: req.params.id,
+        _id:       req.params.id,
         deletedAt: null,
       });
 
       if (!project)
-        return res.status(404).json({ message: "Project nahi mila" });
+        return res.status(404).json({ message: "Project not found" });
 
       return res.status(200).json({ data: project });
     } catch (error) {
@@ -87,20 +76,17 @@ class VendorProjectController extends BaseController {
     }
   };
 
-  // 4. Project ki info update karna (Update)
+  // 4. Update project
   update = async (req, res, next) => {
     try {
-      const VendorProject = getVendorProjectModel();
       const project = await VendorProject.findOne({
-        _id: req.params.id,
+        _id:       req.params.id,
         deletedAt: null,
       });
       if (!project)
-        return res.status(404).json({ message: "Project nahi mila" });
+        return res.status(404).json({ message: "Project not found" });
 
       const { name } = req.body;
-
-      // Agar naam badal rahe hain toh check karo naya naam duplicate toh nahi?
       if (name && name !== project.name) {
         const existing = await VendorProject.findOne({
           name,
@@ -108,54 +94,44 @@ class VendorProjectController extends BaseController {
           _id: { $ne: project._id },
         });
         if (existing)
-          return res
-            .status(400)
-            .json({ message: "Ye naam pehle se use mein hai!" });
+          return res.status(400).json({ message: "Project name already in use!" });
       }
 
-      // Naya data save karo
       Object.assign(project, req.body);
       await project.save();
 
       await createAuditLog({
-        action: "vendor_project_update",
-        description: `Project "${project.name}" update kiya gaya`,
+        performedBy:   req.user.id,          // ✅ fixed
+        performerRole: req.user.accountType, // ✅ fixed
+        action:        "vendor_project_update",
+        category:      "vendor",
+        targetModel:   "VendorProject",
+        targetId:      project._id,
+        description:   `Project "${project.name}" updated`,
         req,
       });
 
-      return res
-        .status(200)
-        .json({ message: "Project update ho gaya!", data: project });
+      return res.status(200).json({ message: "Project updated!", data: project });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   };
 
-  // 5. Project delete karna (Soft Delete)
+  // 5. Soft delete project
   delete = async (req, res, next) => {
     try {
-      const VendorProject = getVendorProjectModel();
-      // Asal mein udao mat, bas deletedAt mein time daal do
-      await VendorProject.updateOne(
-        { _id: req.params.id },
-        { deletedAt: new Date() },
-      );
-
-      return res.status(200).json({ message: "Project delete ho gaya" });
+      await VendorProject.updateOne({ _id: req.params.id }, { deletedAt: new Date() });
+      return res.status(200).json({ message: "Project deleted" });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   };
 
-  // 6. Restore karna
+  // 6. Restore deleted project
   restore = async (req, res, next) => {
     try {
-      const VendorProject = getVendorProjectModel();
-      await VendorProject.updateOne(
-        { _id: req.params.id },
-        { deletedAt: null },
-      );
-      return res.status(200).json({ message: "Project wapas aa gaya!" });
+      await VendorProject.updateOne({ _id: req.params.id }, { deletedAt: null });
+      return res.status(200).json({ message: "Project restored!" });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }

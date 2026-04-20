@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { getVendorDB } from "../db/index.js"; // getting connection for vendor database
 
 const VendorProjectSchema = new mongoose.Schema(
   {
@@ -19,24 +18,15 @@ const VendorProjectSchema = new mongoose.Schema(
     // To track which user created this project
     createdBy: { type: mongoose.Schema.Types.ObjectId },
 
-    // IMPORTANT: This field is for Soft Delete.
-    // It is 'null' by default, but stores a date when deleted.
+    // Soft Delete — null means not deleted, date means deleted
     deletedAt: { type: Date, default: null },
   },
   {
     // Automatically adds 'createdAt' and 'updatedAt' fields
     timestamps: true,
-  },
+  }
 );
 
-// Function to handle database connection
-const getVendorProjectModel = () => {
-  const db = getVendorDB(); // Get the specific connection
+const VendorProject = mongoose.model("VendorProject", VendorProjectSchema);
 
-  // Use existing model or create a new one
-  return (
-    db.models.VendorProject || db.model("VendorProject", VendorProjectSchema)
-  );
-};
-
-export default getVendorProjectModel;
+export default VendorProject;

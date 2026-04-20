@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { getVendorDB } from "../db/index.js"; // getting the vendor database connection
 
 const VendorSchema = new mongoose.Schema(
   {
@@ -27,15 +26,9 @@ const VendorSchema = new mongoose.Schema(
   {
     // Automatically adds 'createdAt' and 'updatedAt'
     timestamps: true,
-  },
+  }
 );
 
-// This function connects the schema to the database
-const getVendorModel = () => {
-  const db = getVendorDB(); // Get the active database connection
+const Vendor = mongoose.model("Vendor", VendorSchema);
 
-  // If the model already exists, use it. Otherwise, create it.
-  return db.models.Vendor || db.model("Vendor", VendorSchema);
-};
-
-export default getVendorModel;
+export default Vendor;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import CommonController from "../../../../controllers/common/commonController.js";
+import CommonController from "../../../../controllers/common/controller.js";
 import isUser from "../../../../middlewares/isUser.js";
 
 const router = Router();

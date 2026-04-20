@@ -6,17 +6,28 @@ import mongoose from 'mongoose';
 import logger from '../logger.js';
 
 class BaseController {
+  /**
+   * Generates a JWT token
+   * @param {string} id - User ID
+   * @param {string} type - Account type
+   * @param {string} duration - Token expiration duration (default: '365d')
+   * @returns {string} JWT token
+   */
     /*create token */
-    generateToken(id, accountType, duration = '365d'){
-      if(!id){
-        throw new ErrorHandler('id not found', 400);
+ generateToken(id, accountType, duration = '365d') {
+    try {
+      if (!id) {
+        throw new ErrorHandler('ID and type are required for token generation', 400);
       }
-      return jwt.sign(
-        {id , accountType},
-        process.env.JWT_SECRET_KEY, //ask about it later
-        {expiresIn: duration}
-      );
+      return jwt.sign({ id, accountType }, process.env.JWT_SECRET_KEY, {
+        expiresIn: duration,
+        algorithm: 'HS256',
+      });
+    } catch (error) {
+      logger.error('Token generation failed:', error);
+      throw new ErrorHandler(error.message || 'Failed to generate token', 500);
     }
+  }
 
     isValidId(id){
         return mongoose.Types.ObjectId.isValid(id);

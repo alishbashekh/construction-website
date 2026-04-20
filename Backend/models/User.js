@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema(
     userId: { type: String, unique: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
-    username: { type: String, unique: true },
+    username: { type: String, unique: true, sparse: true },
     fullName: { type: String, required: true },
     phoneNumber: { type: String },
 
@@ -27,23 +27,16 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// This runs before saving the user to the database
-UserSchema.pre("save", async function (next) {
-  try {
-    // 1. If password is new or changed, encrypt it
-    if (this.isModified("password")) {
-      this.password = await bcrypt.hash(this.password, 10);
-    }
+UserSchema.pre("save", async function () {
+  // 1. If password is new or changed, encrypt it
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
 
-    // 2. Generate a User ID like USR-00001
-    if (!this.userId) {
-      const count = await mongoose.model("User").countDocuments();
-      this.userId = `USR-${String(count + 1).padStart(5, "0")}`;
-    }
-
-    next();
-  } catch (error) {
-    next(error);
+  // 2. Generate a User ID like USR-00001
+  if (!this.userId) {
+    const count = await mongoose.model("User").countDocuments();
+    this.userId = `USR-${String(count + 1).padStart(5, "0")}`;
   }
 });
 

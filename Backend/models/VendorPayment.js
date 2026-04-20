@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { getVendorDB } from "../db/index.js";
 
 const VendorPaymentSchema = new mongoose.Schema(
   {
@@ -57,16 +56,9 @@ const VendorPaymentSchema = new mongoose.Schema(
   {
     // Adds createdAt and updatedAt automatically
     timestamps: true,
-  },
+  }
 );
 
-// Function to connect this schema to the vendor database
-const getVendorPaymentModel = () => {
-  const db = getVendorDB();
-  // Check if model exists, otherwise create new
-  return (
-    db.models.VendorPayment || db.model("VendorPayment", VendorPaymentSchema)
-  );
-};
+const VendorPayment = mongoose.model("VendorPayment", VendorPaymentSchema);
 
-export default getVendorPaymentModel;
+export default VendorPayment;

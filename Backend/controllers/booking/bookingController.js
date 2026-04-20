@@ -16,15 +16,18 @@ class bookingController extends BaseController {
     this.cancel   = this.cancel.bind(this);
     this.transfer = this.transfer.bind(this);
   }
+
   async create(req, res, next) {
     try {
       const validation = this.validateRequiredFields(req.body, [
         'flat', 'client', 'project', 'bookingPrice'
       ]);
       if (validation) return res.status(400).json(validation);
+
       const flatId    = req.body.flat;
       const clientId  = req.body.client;
       const projectId = req.body.project;
+
       if (!this.isValidId(flatId) || !this.isValidId(clientId) || !this.isValidId(projectId)) {
         return this.handleError(next, 'ID galat hai', 400);
       }
@@ -38,33 +41,33 @@ class bookingController extends BaseController {
       if (!project) return this.handleError(next, 'Project not found', 404);
 
       if (flat.status !== 'available') {
-        return this.handleError(next, `Flat is ${flat.status}, book cant be book`, 400);
+        return this.handleError(next, `Flat is ${flat.status}, cannot be booked`, 400);
       }
 
       const booking = await Booking.create({
         ...req.body,
-        createdBy: req.user._id
+        createdBy: req.user.id, // ✅ fixed
       });
 
       flat.status = 'booked';
       await flat.save();
 
       await createAuditLog({
-        performedBy:   req.user._id,
-        performerRole: req.user.role,
+        performedBy:   req.user.id,           // ✅ fixed
+        performerRole: req.user.accountType,  // ✅ fixed
         action:        'booking_create',
         category:      'booking',
         targetModel:   'Booking',
         targetId:      booking._id,
-        description:   `Flat ${flat.flatNumber} has been booked for client "${client.name}" in this project "${project.name}"`,
+        description:   `Flat ${flat.flatNumber} has been booked for client "${client.name}" in project "${project.name}"`,
         newState:      booking.toJSON(),
         req,
       });
 
       return res.status(201).json({
         error: false,
-        message: 'booked successfully!',
-        data: booking
+        message: 'Booked successfully!',
+        data: booking,
       });
 
     } catch (error) {
@@ -74,8 +77,8 @@ class bookingController extends BaseController {
 
   async getAll(req, res, next) {
     try {
-      const page   = req.query.page   || 1;
-      const limit  = req.query.limit  || 10;
+      const page    = req.query.page    || 1;
+      const limit   = req.query.limit   || 10;
       const project = req.query.project || null;
       const client  = req.query.client  || null;
       const status  = req.query.status  || null;
@@ -86,20 +89,19 @@ class bookingController extends BaseController {
       if (project) query.project = project;
       if (client)  query.client  = client;
       if (status)  query.status  = status;
-      if (search) {
-        query.bookingNumber = { $regex: search, $options: 'i' };
-      }
+      if (search)  query.bookingNumber = { $regex: search, $options: 'i' };
 
       const bookings = await Booking.find(query)
         .populate('flat',      'flatNumber floor size type')
         .populate('client',    'name cnic phone')
         .populate('project',   'name location')
         .populate('createdBy', 'fullName email')
-        .sort({ bookingDate: -1 })        
-        .skip((page - 1) * limit)         
-        .limit(parseInt(limit));          
+        .sort({ bookingDate: -1 })
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit));
 
       const total = await Booking.countDocuments(query);
+
       return res.status(200).json({
         error: false,
         data: bookings,
@@ -107,19 +109,21 @@ class bookingController extends BaseController {
           total,
           page:  parseInt(page),
           limit: parseInt(limit),
-          pages: Math.ceil(total / limit)
-        }
+          pages: Math.ceil(total / limit),
+        },
       });
 
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   }
+
   async getById(req, res, next) {
     try {
       if (!this.isValidId(req.params.id)) {
         return this.handleError(next, 'Booking ID is wrong', 400);
       }
+
       const booking = await Booking.findOne({ _id: req.params.id, deletedAt: null })
         .populate('flat',      'flatNumber floor size type status')
         .populate('client',    'name cnic phone email address guardian officePhone residencePhone nomineeName nomineeGuardian nomineeCnic nomineeRelation')
@@ -130,6 +134,7 @@ class bookingController extends BaseController {
         .populate({ path: 'transferredFrom', populate: { path: 'client', select: 'name cnic phone nomineeName address' } });
 
       if (!booking) return this.handleError(next, 'Booking not found', 404);
+
       const allBookingIds  = [booking._id];
       const transferHistory = [];
       let current = booking;
@@ -143,20 +148,22 @@ class bookingController extends BaseController {
 
         allBookingIds.push(prev._id);
         transferHistory.push({
-          bookingId:    prev._id,
+          bookingId:     prev._id,
           bookingNumber: prev.bookingNumber,
-          client:       prev.client,
-          bookingDate:  prev.bookingDate,
-          bookingPrice: prev.bookingPrice,
+          client:        prev.client,
+          bookingDate:   prev.bookingDate,
+          bookingPrice:  prev.bookingPrice,
         });
 
         current = await Booking.findById(prev._id);
         if (!current || !current.transferredFrom) break;
       }
+
       const payments = await Payment.find({
         booking: { $in: allBookingIds },
-        deletedAt: null
+        deletedAt: null,
       }).sort({ paymentDate: -1 });
+
       const currentPayments = payments.filter(p =>
         p.booking.toString() === booking._id.toString()
       );
@@ -165,11 +172,11 @@ class bookingController extends BaseController {
       );
 
       const totalPaid = payments
-        .filter(p => !p.isRefund)       
-        .reduce((sum, p) => sum + p.amount, 0); 
+        .filter(p => !p.isRefund)
+        .reduce((sum, p) => sum + p.amount, 0);
 
       const totalRefunded = payments
-        .filter(p => p.isRefund) 
+        .filter(p => p.isRefund)
         .reduce((sum, p) => sum + p.amount, 0);
 
       return res.status(200).json({
@@ -180,23 +187,25 @@ class bookingController extends BaseController {
           transferredPayments,
           transferHistory,
           financialSummary: {
-            bookingPrice:   booking.bookingPrice,
+            bookingPrice:    booking.bookingPrice,
             totalPaid,
             totalRefunded,
-            outstandingDues: booking.bookingPrice - totalPaid + totalRefunded
-          }
-        }
+            outstandingDues: booking.bookingPrice - totalPaid + totalRefunded,
+          },
+        },
       });
 
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   }
+
   async cancel(req, res, next) {
     try {
       if (!this.isValidId(req.params.id)) {
         return this.handleError(next, 'Booking ID is wrong', 400);
       }
+
       const booking = await Booking.findOne({ _id: req.params.id, deletedAt: null })
         .populate('flat')
         .populate('client', 'name');
@@ -204,24 +213,26 @@ class bookingController extends BaseController {
       if (!booking) return this.handleError(next, 'Booking not found', 404);
 
       if (booking.status !== 'active') {
-        return this.handleError(next, `${booking.status} booking cant be cancel`, 400);
+        return this.handleError(next, `${booking.status} booking cannot be cancelled`, 400);
       }
 
       const payments  = await Payment.find({
         booking:  booking._id,
         isRefund: false,
-        deletedAt: null
+        deletedAt: null,
       });
       const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+
       booking.status             = 'cancelled';
       booking.cancelledAt        = new Date();
-      booking.cancelledBy        = req.user._id;
+      booking.cancelledBy        = req.user.id;         // ✅ fixed
       booking.cancellationReason = req.body.reason || '';
       await booking.save();
 
-      const flat    = await Flat.findById(booking.flat._id);
-      flat.status   = 'available';
+      const flat  = await Flat.findById(booking.flat._id);
+      flat.status = 'available';
       await flat.save();
+
       if (totalPaid > 0) {
         await Payment.create({
           booking:     booking._id,
@@ -233,18 +244,18 @@ class bookingController extends BaseController {
           paymentDate: new Date(),
           description: `Refund for cancelled booking ${booking.bookingNumber}`,
           isRefund:    true,
-          createdBy:   req.user._id,
+          createdBy:   req.user.id, // ✅ fixed
         });
       }
 
       await createAuditLog({
-        performedBy:   req.user._id,
-        performerRole: req.user.role,
+        performedBy:   req.user.id,           // ✅ fixed
+        performerRole: req.user.accountType,  // ✅ fixed
         action:        'booking_cancel',
         category:      'booking',
         targetModel:   'Booking',
         targetId:      booking._id,
-        description:   `Booking ${booking.bookingNumber} cancel client's refund "${booking.client.name}" . Refund: ${totalPaid}`,
+        description:   `Booking ${booking.bookingNumber} cancelled for client "${booking.client.name}". Refund: ${totalPaid}`,
         reason:        req.body.reason,
         req,
         severity:      'warning',
@@ -252,17 +263,17 @@ class bookingController extends BaseController {
 
       return res.status(200).json({
         error: false,
-        message: 'Booking cancelation done!',
-        data: { booking, refundAmount: totalPaid }
+        message: 'Booking cancelled successfully!',
+        data: { booking, refundAmount: totalPaid },
       });
 
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   }
+
   async transfer(req, res, next) {
     try {
-
       if (!this.isValidId(req.params.id)) {
         return this.handleError(next, 'Booking ID is wrong', 400);
       }
@@ -281,11 +292,11 @@ class bookingController extends BaseController {
       if (!oldBooking) return this.handleError(next, 'Booking not found', 404);
 
       if (oldBooking.status !== 'active') {
-        return this.handleError(next, `${oldBooking.status} booking cant transfer`, 400);
+        return this.handleError(next, `${oldBooking.status} booking cannot be transferred`, 400);
       }
 
       const newClient = await Client.findOne({ _id: req.body.newClient, deletedAt: null });
-      if (!newClient) return this.handleError(next, 'no new client found', 404);
+      if (!newClient) return this.handleError(next, 'New client not found', 404);
 
       const newBooking = await Booking.create({
         flat:            oldBooking.flat._id,
@@ -294,41 +305,38 @@ class bookingController extends BaseController {
         bookingDate:     new Date(),
         bookingPrice:    req.body.bookingPrice || oldBooking.bookingPrice,
         paymentPlan:     req.body.paymentPlan  || oldBooking.paymentPlan,
-        transferredFrom: oldBooking._id, 
-        createdBy:       req.user._id,
+        transferredFrom: oldBooking._id,
+        createdBy:       req.user.id, // ✅ fixed
       });
 
-      oldBooking.status       = 'transferred';
-      oldBooking.transferredTo = newBooking._id; 
+      oldBooking.status        = 'transferred';
+      oldBooking.transferredTo = newBooking._id;
       await oldBooking.save();
 
-      // STEP 9: Audit log
       await createAuditLog({
-        performedBy:   req.user._id,
-        performerRole: req.user.role,
+        performedBy:   req.user.id,           // ✅ fixed
+        performerRole: req.user.accountType,  // ✅ fixed
         action:        'booking_transfer',
         category:      'booking',
         targetModel:   'Booking',
         targetId:      oldBooking._id,
-        description:   `Booking ${oldBooking.bookingNumber} "${oldBooking.client.name}" to "${newClient.name}" transferrd. New booking: ${newBooking.bookingNumber}`,
+        description:   `Booking ${oldBooking.bookingNumber} transferred from "${oldBooking.client.name}" to "${newClient.name}". New booking: ${newBooking.bookingNumber}`,
         previousState: { client: oldBooking.client._id, bookingNumber: oldBooking.bookingNumber },
         newState:      { client: newClient._id,          bookingNumber: newBooking.bookingNumber },
         req,
         severity:      'warning',
       });
 
-   
       return res.status(200).json({
         error: false,
-        message: 'Booking transfer successfully',
-        data: { oldBooking, newBooking }
+        message: 'Booking transferred successfully!',
+        data: { oldBooking, newBooking },
       });
 
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   }
-
 }
 
 export default new bookingController();

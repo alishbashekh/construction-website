@@ -32,15 +32,11 @@ BookingSchema.index({ flat: 1, status: 1 });
 BookingSchema.index({ status: 1 });
 BookingSchema.index({ bookingDate: -1 });
 
-BookingSchema.pre('save', async function (next) {
-  try {
-    if (!this.bookingNumber) {
-      const count = await mongoose.model('Booking').countDocuments();
-      this.bookingNumber = `BKG-${String(count + 1).padStart(5, '0')}`;
-    }
-    next();
-  } catch (error) {
-    next(error);
+// ✅ Fixed: removed next parameter
+BookingSchema.pre('save', async function () {
+  if (!this.bookingNumber) {
+    const count = await mongoose.model('Booking').countDocuments();
+    this.bookingNumber = `BKG-${String(count + 1).padStart(5, '0')}`;
   }
 });
 

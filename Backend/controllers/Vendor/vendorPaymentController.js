@@ -1,64 +1,57 @@
-import getVendorPaymentModel from "../../models/VendorPayment.js";
-import getVendorModel from "../../models/Vendor.js";
-import getVendorProjectModel from "../../models/VendorProject.js";
+import VendorPayment from "../../models/VendorPayment.js";
+import Vendor from "../../models/Vendor.js";
+import VendorProject from "../../models/VendorProject.js";
 import BaseController from "../BaseController.js";
 import { createAuditLog } from "../../utils/auditLog.js";
 
 class VendorPaymentController extends BaseController {
-  // 1. Naya Contract banana (Create)
+  // 1. Create new contract
   create = async (req, res, next) => {
     try {
-      const VendorPayment = getVendorPaymentModel();
-      const {
-        project,
-        vendor,
-        totalAmount,
-        initialAmount,
-        initialPaymentMode,
-      } = req.body;
+      const { project, vendor, totalAmount, initialAmount, initialPaymentMode } = req.body;
 
-      // Basic Check: Kya paise aur vendor ka bataya hai?
       if (!project || !vendor || !totalAmount)
-        return res.status(400).json({ message: "Fields miss hain!" });
+        return res.status(400).json({ message: "Project, vendor and totalAmount are required!" });
 
-      // Receipt Number banao (e.g., VREC-00001)
       const count = await VendorPayment.countDocuments();
       const receiptNumber = `VREC-${String(count + 1).padStart(5, "0")}`;
 
-      let payments = [];
+      let payments  = [];
       let totalPaid = 0;
 
-      // Agar shuru mein kuch paise (Advance) diye hain toh list mein dalo
       if (initialAmount > 0) {
         if (!initialPaymentMode)
-          return res.status(400).json({ message: "Payment mode batayein!" });
+          return res.status(400).json({ message: "Payment mode is required!" });
 
         payments.push({
-          amount: initialAmount,
+          amount:      initialAmount,
           paymentMode: initialPaymentMode,
-          date: req.body.date || new Date(),
+          date:        req.body.date || new Date(),
         });
         totalPaid = initialAmount;
       }
 
-      // Status set karo: Paid, Partially Paid ya Pending?
       let status = "pending";
-      if (totalPaid === totalAmount) status = "paid";
-      else if (totalPaid > 0) status = "partially_paid";
+      if (totalPaid === totalAmount)  status = "paid";
+      else if (totalPaid > 0)         status = "partially_paid";
 
-      // Database mein save karo
       const payment = await VendorPayment.create({
         ...req.body,
         receiptNumber,
         totalPaid,
         payments,
         status,
-        createdBy: req.user._id,
+        createdBy: req.user.id, // ✅ fixed
       });
 
       await createAuditLog({
-        action: "vendor_payment_create",
-        description: `Vendor contract banaya gaya: ${receiptNumber}`,
+        performedBy:   req.user.id,          // ✅ fixed
+        performerRole: req.user.accountType, // ✅ fixed
+        action:        "vendor_payment_create",
+        category:      "vendor",
+        targetModel:   "VendorPayment",
+        targetId:      payment._id,
+        description:   `Vendor contract created: ${receiptNumber}`,
         req,
       });
 
@@ -68,62 +61,57 @@ class VendorPaymentController extends BaseController {
     }
   };
 
-  // 2. Kisi Purane Contract mein mazeed paise (Installment) add karna
+  // 2. Add installment to existing contract
   addPayment = async (req, res, next) => {
     try {
-      const VendorPayment = getVendorPaymentModel();
       const { amount, paymentMode } = req.body;
 
-      // Contract dhoondo
       const contract = await VendorPayment.findOne({
-        _id: req.params.id,
+        _id:       req.params.id,
         deletedAt: null,
       });
       if (!contract)
-        return res.status(404).json({ message: "Contract nahi mila!" });
+        return res.status(404).json({ message: "Contract not found!" });
 
-      // Check: Kahin total amount se zyada paise toh nahi de rahe?
       const remaining = contract.totalAmount - contract.totalPaid;
       if (amount > remaining)
-        return res
-          .status(400)
-          .json({ message: "Paise baqi amount se zyada hain!" });
+        return res.status(400).json({ message: "Amount exceeds remaining balance!" });
 
-      // Nayi payment list mein dalo
       contract.payments.push({ amount, paymentMode, date: new Date() });
       contract.totalPaid += amount;
 
-      // Status update karo
       if (contract.totalPaid === contract.totalAmount) contract.status = "paid";
       else contract.status = "partially_paid";
 
       await contract.save();
 
       await createAuditLog({
-        action: "vendor_payment_add",
-        description: `Installment add ki gayi: ${amount}`,
+        performedBy:   req.user.id,          // ✅ fixed
+        performerRole: req.user.accountType, // ✅ fixed
+        action:        "vendor_payment_add",
+        category:      "vendor",
+        targetModel:   "VendorPayment",
+        targetId:      contract._id,
+        description:   `Installment added: ${amount}`,
         req,
       });
 
-      return res
-        .status(201)
-        .json({ message: "Payment add ho gayi!", data: contract });
+      return res.status(201).json({ message: "Payment added!", data: contract });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   };
 
-  // 3. Sab Contracts ki list dekhna
+  // 3. Get all contracts
   getAll = async (req, res, next) => {
     try {
-      const VendorPayment = getVendorPaymentModel();
       const { page = 1, limit = 10, search } = req.query;
 
       const query = { deletedAt: null };
       if (search) query.receiptNumber = { $regex: search, $options: "i" };
 
       const data = await VendorPayment.find(query)
-        .populate("vendor", "name category")
+        .populate("vendor",  "name category")
         .populate("project", "name")
         .limit(limit * 1)
         .skip((page - 1) * limit);
@@ -134,35 +122,28 @@ class VendorPaymentController extends BaseController {
     }
   };
 
-  // 4. Contract ki detail aur baqi paise (Outstanding) dekhna
+  // 4. Get single contract with outstanding balance
   getById = async (req, res, next) => {
     try {
-      const VendorPayment = getVendorPaymentModel();
       const payment = await VendorPayment.findOne({
-        _id: req.params.id,
+        _id:       req.params.id,
         deletedAt: null,
       }).populate("vendor project");
 
-      if (!payment) return res.status(404).json({ message: "Nahi mila" });
+      if (!payment) return res.status(404).json({ message: "Contract not found" });
 
       const outstanding = payment.totalAmount - payment.totalPaid;
-      return res
-        .status(200)
-        .json({ data: { ...payment.toJSON(), outstanding } });
+      return res.status(200).json({ data: { ...payment.toJSON(), outstanding } });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   };
 
-  // 5. Delete (Soft Delete)
+  // 5. Soft delete contract
   delete = async (req, res, next) => {
     try {
-      const VendorPayment = getVendorPaymentModel();
-      await VendorPayment.updateOne(
-        { _id: req.params.id },
-        { deletedAt: new Date() },
-      );
-      return res.status(200).json({ message: "Delete ho gaya" });
+      await VendorPayment.updateOne({ _id: req.params.id }, { deletedAt: new Date() });
+      return res.status(200).json({ message: "Contract deleted" });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }

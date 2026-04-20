@@ -12,7 +12,7 @@ class FlatController extends BaseController {
       // Pehle check karo user ne saari zaroori cheezein (Flat No, Floor etc) likhi hain?
       const { project, flatNumber, floor, size, type } = req.body;
       if (!project || !flatNumber || !floor)
-        return res.status(400).json({ message: "Fields miss hain!" });
+        return res.status(400).json({ message: "Fields missing!" });
 
       // Check karo ke ye Project database mein majood hai bhi ya nahi?
       const projectExists = await Project.findOne({
@@ -20,15 +20,15 @@ class FlatController extends BaseController {
         deletedAt: null,
       });
       if (!projectExists)
-        return res.status(404).json({ message: "Project nahi mila!" });
+        return res.status(404).json({ message: "Project not found!" });
 
       // Ab database mein naya flat save kar lo
-      const flat = await Flat.create({ ...req.body, createdBy: req.user._id });
+      const flat = await Flat.create({ ...req.body, createdBy: req.user.id });
 
       // Register mein entry kar do ke naya flat ban gaya hai
       await createAuditLog({
         action: "flat_create",
-        description: `Naya Flat ${flatNumber} banaya gaya`,
+        description: `New Flat ${flatNumber} has been made`,
         req,
       });
 
@@ -66,7 +66,7 @@ class FlatController extends BaseController {
         _id: req.params.id,
         deletedAt: null,
       }).populate("project", "name");
-      if (!flat) return res.status(404).json({ message: "Flat nahi mila" });
+      if (!flat) return res.status(404).json({ message: "Flat not found" });
 
       // 2. Is flat ki jitni Bookings aur Payments hui hain, wo uthao
       const bookings = await Booking.find({ flat: flat._id, deletedAt: null });
@@ -105,7 +105,7 @@ class FlatController extends BaseController {
         { $set: req.body },
         { new: true }, // Taake update hone ke baad naya wala data dikhaye
       );
-      return res.status(200).json({ message: "Update ho gaya!", data: flat });
+      return res.status(200).json({ message: "Updated successfully!", data: flat });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
@@ -120,12 +120,12 @@ class FlatController extends BaseController {
       if (flat.status === "booked")
         return res
           .status(400)
-          .json({ message: "Booked flat delete nahi ho sakta!" });
+          .json({ message: "Booked flat cant be deleted!" });
 
       flat.deletedAt = new Date(); // Bas delete ki stamp laga di
       await flat.save();
 
-      return res.status(200).json({ message: "Flat delete ho gaya" });
+      return res.status(200).json({ message: "Flat deleted successfuly" });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
@@ -140,7 +140,7 @@ class FlatController extends BaseController {
 
       return res
         .status(200)
-        .json({ message: "Status tabdeel ho gaya", data: flat });
+        .json({ message: "Status changed successfully", data: flat });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }

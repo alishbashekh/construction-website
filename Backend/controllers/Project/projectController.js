@@ -13,7 +13,7 @@ class ProjectController extends BaseController {
       if (!name || !location)
         return res
           .status(400)
-          .json({ message: "Naam aur Location lazmi hai!" });
+          .json({ message: "Name and location required" });
 
       // Check karo ke is naam aur jagah ka project pehle se toh nahi bana hua?
       const checkProject = await Project.findOne({
@@ -24,18 +24,18 @@ class ProjectController extends BaseController {
       if (checkProject)
         return res
           .status(400)
-          .json({ message: "Ye project pehle se majood hai!" });
+          .json({ message: "project already exist!" });
 
       // Database mein naya project save karo
       const project = await Project.create({
         ...req.body,
-        createdBy: req.user._id,
+        createdBy: req.user.id,
       });
 
       // Audit Log: Diary mein entry
       await createAuditLog({
         action: "project_create",
-        description: `Naya Project "${name}" shuru kiya gaya`,
+        description: `new Project "${name}" started`,
         req,
       });
 
@@ -83,7 +83,7 @@ class ProjectController extends BaseController {
         deletedAt: null,
       });
       if (!project)
-        return res.status(404).json({ message: "Project nahi mila" });
+        return res.status(404).json({ message: "Project not found" });
 
       // Is project ke saare flats bhi dhoondo
       const flats = await Flat.find({ project: project._id, deletedAt: null });
@@ -105,13 +105,13 @@ class ProjectController extends BaseController {
 
       await createAuditLog({
         action: "project_update",
-        description: `Project "${project.name}" update kiya gaya`,
+        description: `Project "${project.name}" has been updated`,
         req,
       });
 
       return res
         .status(200)
-        .json({ message: "Project details update ho gayin!", data: project });
+        .json({ message: "Project details updated!", data: project });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
@@ -124,7 +124,7 @@ class ProjectController extends BaseController {
         { _id: req.params.id },
         { deletedAt: new Date() },
       );
-      return res.status(200).json({ message: "Project delete ho gaya" });
+      return res.status(200).json({ message: "Project deleted successfully!" });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }

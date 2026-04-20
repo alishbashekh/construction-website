@@ -1,63 +1,55 @@
-import getVendorModel from "../../models/Vendor.js";
-import getVendorPaymentModel from "../../models/VendorPayment.js";
+import Vendor from "../../models/Vendor.js";
+import VendorPayment from "../../models/VendorPayment.js";
 import BaseController from "../BaseController.js";
 import { createAuditLog } from "../../utils/auditLog.js";
 
 class VendorController extends BaseController {
-  // 1. Naya Vendor register karna
+  // 1. Create new vendor
   create = async (req, res, next) => {
     try {
-      const Vendor = getVendorModel();
       const { name, category, phone } = req.body;
 
-      // Check karo: Kya naam, category aur phone number diya hai?
       if (!name || !category || !phone)
-        return res
-          .status(400)
-          .json({ message: "Zaroori details missing hain!" });
+        return res.status(400).json({ message: "Name, category and phone are required!" });
 
-      // Duplicate Check: Kahin is naam ya phone ka banda pehle se list mein toh nahi?
       const existing = await Vendor.findOne({
         deletedAt: null,
         $or: [{ name }, { phone }],
       });
       if (existing)
-        return res
-          .status(400)
-          .json({ message: "Is naam ya phone ka vendor pehle se majood hai!" });
+        return res.status(400).json({ message: "Vendor with this name or phone already exists!" });
 
-      // Database mein save karo
       const vendor = await Vendor.create({
         ...req.body,
-        createdBy: req.user._id,
+        createdBy: req.user.id, // ✅ fixed
       });
 
-      // Audit Log: Diary mein likho ke naya vendor add hua
       await createAuditLog({
-        action: "vendor_create",
-        description: `Vendor ${name} add kiya gaya`,
+        performedBy:   req.user.id,          // ✅ fixed
+        performerRole: req.user.accountType, // ✅ fixed
+        action:        "vendor_create",
+        category:      "vendor",
+        targetModel:   "Vendor",
+        targetId:      vendor._id,
+        description:   `Vendor ${name} created`,
         req,
       });
 
-      return res
-        .status(201)
-        .json({ error: false, message: "Vendor ban gaya!", data: vendor });
+      return res.status(201).json({ error: false, message: "Vendor created!", data: vendor });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   };
 
-  // 2. Sab Vendors ki list dekhna
+  // 2. Get all vendors
   getAll = async (req, res, next) => {
     try {
-      const Vendor = getVendorModel();
       const { page = 1, limit = 10, search } = req.query;
       let query = { deletedAt: null };
 
-      // Search: Naam ya phone se dhoondo
       if (search) {
         query.$or = [
-          { name: { $regex: search, $options: "i" } },
+          { name:  { $regex: search, $options: "i" } },
           { phone: { $regex: search, $options: "i" } },
         ];
       }
@@ -75,30 +67,19 @@ class VendorController extends BaseController {
     }
   };
 
-  // 3. Ek Vendor ki poori detail aur uski payments (Get By ID)
+  // 3. Get single vendor with payments
   getById = async (req, res, next) => {
     try {
-      const Vendor = getVendorModel();
-      const VendorPayment = getVendorPaymentModel();
+      const vendor = await Vendor.findOne({ _id: req.params.id, deletedAt: null });
+      if (!vendor) return res.status(404).json({ message: "Vendor not found" });
 
-      const vendor = await Vendor.findOne({
-        _id: req.params.id,
-        deletedAt: null,
-      });
-      if (!vendor) return res.status(404).json({ message: "Vendor nahi mila" });
-
-      // Is vendor ki saari payments dhoondo
       const payments = await VendorPayment.find({
         vendor: vendor._id,
         deletedAt: null,
       }).populate("project", "name");
 
-      // Maths: Total kitne paise diye aur kitni adjustment hui
-      const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
-      const totalAdjustment = payments.reduce(
-        (sum, p) => sum + (p.adjustment || 0),
-        0,
-      );
+      const totalPaid       = payments.reduce((sum, p) => sum + p.amount, 0);
+      const totalAdjustment = payments.reduce((sum, p) => sum + (p.adjustment || 0), 0);
 
       return res.status(200).json({
         data: {
@@ -116,59 +97,58 @@ class VendorController extends BaseController {
     }
   };
 
-  // 4. Vendor ki info badalna (Update)
+  // 4. Update vendor
   update = async (req, res, next) => {
     try {
-      const Vendor = getVendorModel();
-      const vendor = await Vendor.findOne({
-        _id: req.params.id,
-        deletedAt: null,
-      });
-      if (!vendor) return res.status(404).json({ message: "Vendor nahi mila" });
+      const vendor = await Vendor.findOne({ _id: req.params.id, deletedAt: null });
+      if (!vendor) return res.status(404).json({ message: "Vendor not found" });
 
-      // Agar naam ya phone change ho raha hai, toh check karo naya wala kisi aur ka toh nahi?
       const { name, phone } = req.body;
       if (name || phone) {
         const duplicate = await Vendor.findOne({
-          _id: { $ne: vendor._id },
+          _id:       { $ne: vendor._id },
           deletedAt: null,
           $or: [{ name }, { phone }],
         });
         if (duplicate)
-          return res
-            .status(400)
-            .json({ message: "Naya naam ya phone pehle se use mein hai!" });
+          return res.status(400).json({ message: "Name or phone already in use!" });
       }
 
-      // Update karo
       Object.assign(vendor, req.body);
       await vendor.save();
 
-      return res
-        .status(200)
-        .json({ message: "Vendor update ho gaya!", data: vendor });
+      await createAuditLog({
+        performedBy:   req.user.id,          // ✅ fixed
+        performerRole: req.user.accountType, // ✅ fixed
+        action:        "vendor_update",
+        category:      "vendor",
+        targetModel:   "Vendor",
+        targetId:      vendor._id,
+        description:   `Vendor ${vendor.name} updated`,
+        req,
+      });
+
+      return res.status(200).json({ message: "Vendor updated!", data: vendor });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   };
 
-  // 5. Vendor nikaal dena (Soft Delete)
+  // 5. Soft delete vendor
   delete = async (req, res, next) => {
     try {
-      const Vendor = getVendorModel();
       await Vendor.updateOne({ _id: req.params.id }, { deletedAt: new Date() });
-      return res.status(200).json({ message: "Vendor delete kar diya gaya" });
+      return res.status(200).json({ message: "Vendor deleted" });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
   };
 
-  // 6. Delete kiye hue vendor ko wapas lana (Restore)
+  // 6. Restore deleted vendor
   restore = async (req, res, next) => {
     try {
-      const Vendor = getVendorModel();
       await Vendor.updateOne({ _id: req.params.id }, { deletedAt: null });
-      return res.status(200).json({ message: "Vendor wapas aa gaya!" });
+      return res.status(200).json({ message: "Vendor restored!" });
     } catch (error) {
       return this.handleError(next, error.message, 500);
     }
