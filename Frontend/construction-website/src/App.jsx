@@ -2,7 +2,6 @@ import React from "react";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute, PublicRoute } from "./components/common/RouteGuards";
-import RegisterPage from "./pages/auth/RegisterPage";
 import LoginPage from "./pages/auth/LoginPage";
 import DashboardLayout from "./layout/DashboardLayout";
 import Dashboard from "./pages/General/Dashboard";
@@ -36,14 +35,6 @@ const App = () => {
               </PublicRoute>
             }
           />
-          <Route
-            path="/register"
-            element={
-              <PublicRoute>
-                <RegisterPage />
-              </PublicRoute>
-            }
-          />
 
           {/* Protected Routes */}
           <Route
@@ -65,9 +56,15 @@ const App = () => {
 
             {/* Reports */}
             <Route path="reports/sales-summary" element={<SalesSummary />} />
-            <Route path="reports/flats-availability" element={<FlatsAvailability />} />
+            <Route
+              path="reports/flats-availability"
+              element={<FlatsAvailability />}
+            />
             <Route path="reports/client-dues" element={<ClientDues />} />
-            <Route path="reports/payment-collection" element={<PaymentCollection />} />
+            <Route
+              path="reports/payment-collection"
+              element={<PaymentCollection />}
+            />
             <Route path="reports/client-ledger" element={<ClientLedger />} />
           </Route>
 

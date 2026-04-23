@@ -53,7 +53,7 @@ const LoginPage = () => {
 
   return (
     <>
-      <div className="auth-bg min-h-screen flex items-center justify-center p-4 bg-[var(--accent)]">
+      <div className="auth-bg min-h-screen flex items-center justify-center  bg-[var(--accent)]">
         <div className="relative z-10 w-full max-w-md">
           <AuthCard>
             <div className="flex justify-center mb-6">
@@ -124,7 +124,7 @@ const LoginPage = () => {
               </PrimaryButton>
             </form>
 
-            <p className="text-center text-sm text-slate-500 mt-6">
+            {/* <p className="text-center text-sm text-slate-500 mt-6">
               Don't have an account?{" "}
               <Link
                 to="/register"
@@ -132,7 +132,7 @@ const LoginPage = () => {
               >
                 Create account
               </Link>
-            </p>
+            </p> */}
           </AuthCard>
         </div>
       </div>
