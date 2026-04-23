@@ -8,15 +8,13 @@ import {
 import { authAPI } from "../utils/apiService";
 
 const AuthContext = createContext(null);
-const STORAGE_KEY = "ottoman_token";
-const USER_KEY = "ottoman_user";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem(USER_KEY);
+    const stored = localStorage.getItem("ottoman_user");
     if (stored) {
       try {
         setUser(JSON.parse(stored));
@@ -29,8 +27,8 @@ export function AuthProvider({ children }) {
     try {
       const res = await authAPI.login(email, password);
       const { user, token } = res.data.data;
-      localStorage.setItem(STORAGE_KEY, token);
-      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      localStorage.setItem("ottoman_token", token);
+      localStorage.setItem("ottoman_user", JSON.stringify(user));
       setUser(user);
       return { success: true };
     } catch (err) {
@@ -41,29 +39,9 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const register = useCallback(
-    async (fullName, email, password, role = "booking_officer") => {
-      try {
-        const res = await authAPI.createUser({
-          fullName,
-          email,
-          password,
-          role,
-        });
-        return { success: true };
-      } catch (err) {
-        return {
-          success: false,
-          error: err.response?.data?.message || "Register failed",
-        };
-      }
-    },
-    [],
-  );
-
   const logout = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem("ottoman_token");
+    localStorage.removeItem("ottoman_user");
     setUser(null);
   }, []);
 
@@ -85,7 +63,6 @@ export function AuthProvider({ children }) {
         user,
         loading,
         login,
-        register,
         logout,
         sendPasswordReset,
         isAuthenticated: !!user,
