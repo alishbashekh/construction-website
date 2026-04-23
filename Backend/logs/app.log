@@ -48,3 +48,36 @@
 [2026-04-19 19:30:34] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
 [2026-04-19 19:33:48] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
 [2026-04-19 19:34:14] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-21 23:34:23] INFO: Database connected
+[2026-04-21 23:34:23] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-21 23:34:37] INFO: Database connected
+[2026-04-21 23:34:37] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-21 23:36:57] INFO: Database connected
+[2026-04-21 23:36:57] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-22 00:00:46] INFO: MongoDB connected: localhost
+[2026-04-22 00:00:46] INFO: Database connected
+[2026-04-22 00:00:46] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-22 00:02:21] INFO: MongoDB connected: localhost
+[2026-04-22 00:02:21] INFO: Database connected
+[2026-04-22 00:02:21] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-22 00:04:36] INFO: MongoDB connected: localhost
+[2026-04-22 00:04:36] INFO: Database connected
+[2026-04-22 00:04:36] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-22 00:10:44] INFO: MongoDB connected: localhost
+[2026-04-22 00:10:44] INFO: Database connected
+[2026-04-22 00:10:44] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-22 00:15:59] INFO: MongoDB connected: localhost
+[2026-04-22 00:15:59] INFO: Database connected
+[2026-04-22 00:15:59] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-22 00:24:39] INFO: MongoDB connected: localhost
+[2026-04-22 00:24:39] INFO: Database connected
+[2026-04-22 00:24:39] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-22 19:52:57] INFO: MongoDB connected: localhost
+[2026-04-22 19:52:57] INFO: Database connected
+[2026-04-22 19:52:57] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-22 19:58:30] INFO: MongoDB connected: localhost
+[2026-04-22 19:58:30] INFO: Database connected
+[2026-04-22 19:58:30] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-22 20:12:50] INFO: MongoDB connected: localhost
+[2026-04-22 20:12:50] INFO: Database connected
+[2026-04-22 20:12:50] INFO: Server running on http://localhost:3000/api/v1
