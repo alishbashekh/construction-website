@@ -14,7 +14,7 @@ class BaseController {
    * @returns {string} JWT token
    */
   /*create token */
-  generateToken(id, role, duration = "365d") {
+  generateToken(id, role, duration = '365d') {
     try {
       if (!id) {
         throw new ErrorHandler(
