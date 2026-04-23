@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import DataTable from "../../components/common/DataTable";
 import FormPage, {
   FormGrid,
@@ -10,64 +10,23 @@ import FormPage, {
   FormSubmitButton,
   FormCancelButton,
 } from "../../components/common/FormPage";
-import { Check, UserPlus, X } from "lucide-react";
+import { Check, UserPlus, X, Loader2, AlertCircle } from "lucide-react";
+import { authAPI } from "../../utils/apiService";
 
-const ROLES = ["System Admin", "Booking Officer", "Accounts Officer"];
-const STATUSES = ["Active", "Disabled"];
+const ROLE_LABELS = {
+  system_admin:     "System Admin",
+  booking_officer:  "Booking Officer",
+  accounts_officer: "Accounts Officer",
+};
 
-const UsersData = [
-  {
-    id: "USR-00006",
-    name: "Muhammad Awais",
-    email: "mawais1986@gmail.com",
-    phone: "03237643876",
-    role: "Booking Officer",
-    status: "Active",
-  },
-  {
-    id: "USR-00005",
-    name: "Huzaifa Arain",
-    email: "huzaifaarain11224@gmail.com",
-    phone: "+923160306237",
-    role: "Booking Officer",
-    status: "Active",
-  },
-  {
-    id: "USR-00004",
-    name: "Ali Raza",
-    email: "aliraza99@gmail.com",
-    phone: "03001234567",
-    role: "Accounts Officer",
-    status: "Disabled",
-  },
-  {
-    id: "USR-00003",
-    name: "Yazdan Shaikh",
-    email: "yazdanshaikh11@gmail.com",
-    phone: "03131079353",
-    role: "Accounts Officer",
-    status: "Active",
-  },
-  {
-    id: "USR-00002",
-    name: "Sameer Shaikh",
-    email: "alisameer52718@gmail.com",
-    phone: "03160306237",
-    role: "System Admin",
-    status: "Active",
-  },
-  {
-    id: "USR-00001",
-    name: "Admin User",
-    email: "admin@ottoman.com",
-    phone: "02199887766",
-    role: "System Admin",
-    status: "Active",
-  },
+const ROLE_OPTIONS = [
+  { value: "system_admin",     label: "System Admin" },
+  { value: "booking_officer",  label: "Booking Officer" },
+  { value: "accounts_officer", label: "Accounts Officer" },
 ];
 
 function StatusBadge({ value }) {
-  return value === "Active" ? (
+  return value === true || value === "Active" ? (
     <span className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
       Active
     </span>
@@ -79,11 +38,16 @@ function StatusBadge({ value }) {
 }
 
 const COLUMNS = [
-  { key: "id", label: "User ID", sortable: true },
-  { key: "name", label: "Name", sortable: true },
-  { key: "email", label: "Email", sortable: true },
-  { key: "phone", label: "Phone", sortable: false },
-  { key: "role", label: "Role", sortable: true },
+  { key: "userId",    label: "User ID",  sortable: true },
+  { key: "fullName",  label: "Name",     sortable: true },
+  { key: "email",     label: "Email",    sortable: true },
+  { key: "phoneNumber", label: "Phone",  sortable: false },
+  {
+    key: "role",
+    label: "Role",
+    sortable: true,
+    render: (v) => ROLE_LABELS[v] || v,
+  },
   {
     key: "status",
     label: "Status",
@@ -96,39 +60,49 @@ const FILTERS = [
   {
     key: "role",
     options: [
-      { value: "", label: "All roles" },
-      { value: "System Admin", label: "System Admin" },
-      { value: "Booking Officer", label: "Booking Officer" },
-      { value: "Accounts Officer", label: "Accounts Officer" },
+      { value: "",                label: "All roles" },
+      { value: "system_admin",    label: "System Admin" },
+      { value: "booking_officer", label: "Booking Officer" },
+      { value: "accounts_officer",label: "Accounts Officer" },
     ],
   },
   {
     key: "status",
     options: [
-      { value: "", label: "All statuses" },
-      { value: "Active", label: "Active" },
-      { value: "Disabled", label: "Disabled" },
+      { value: "",      label: "All statuses" },
+      { value: "true",  label: "Active" },
+      { value: "false", label: "Disabled" },
     ],
   },
 ];
 
-const EMPTY = {
-  name: "",
-  email: "",
-  phone: "",
-  role: "",
-  password: "",
-  confirm: "",
-};
+const EMPTY = { fullName: "", email: "", phoneNumber: "", role: "", password: "", confirm: "" };
 
-/* ══════════════════════════════════════ */
 export default function UsersPage() {
-  const [users, setUsers] = useState(UsersData);
-  const [view, setView] = useState("table");
-  const [form, setForm] = useState(EMPTY);
-  const [errors, setErrors] = useState({});
+  const [users,   setUsers]   = useState([]);
+  const [view,    setView]    = useState("table");
+  const [form,    setForm]    = useState(EMPTY);
+  const [errors,  setErrors]  = useState({});
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState("");
+  const [fetching,setFetching]= useState(true);
+  const [fetchErr,setFetchErr]= useState("");
+  const [toast,   setToast]   = useState("");
+
+  // ── Fetch users from backend ──
+  const loadUsers = useCallback(async () => {
+    setFetching(true);
+    setFetchErr("");
+    try {
+      const res = await authAPI.getUsers(1, 100);
+      setUsers(res.data.data || []);
+    } catch (err) {
+      setFetchErr(err.response?.data?.message || "Failed to load users.");
+    } finally {
+      setFetching(false);
+    }
+  }, []);
+
+  useEffect(() => { loadUsers(); }, [loadUsers]);
 
   const field = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -142,16 +116,14 @@ export default function UsersPage() {
 
   function validate() {
     const e = {};
-    if (!form.name.trim()) e.name = "Full name is required.";
+    if (!form.fullName.trim()) e.fullName = "Full name is required.";
     if (!form.email.trim()) e.email = "Email is required.";
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Enter a valid email.";
-    if (!form.phone.trim()) e.phone = "Phone number is required.";
     if (!form.role) e.role = "Please select a role.";
     if (!form.password) e.password = "Password is required.";
     else if (form.password.length < 6) e.password = "Min 6 characters.";
     if (!form.confirm) e.confirm = "Please confirm password.";
-    else if (form.confirm !== form.password)
-      e.confirm = "Passwords don't match.";
+    else if (form.confirm !== form.password) e.confirm = "Passwords don't match.";
     return e;
   }
 
@@ -159,25 +131,56 @@ export default function UsersPage() {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) return setErrors(errs);
+
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-    const n = users.length + 1;
-    setUsers((prev) => [
-      {
-        id: `USR-${String(n).padStart(5, "0")}`,
-        name: form.name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        role: form.role,
-        status: "Active",
-      },
-      ...prev,
-    ]);
-    setLoading(false);
-    setForm(EMPTY);
-    setErrors({});
-    setView("table");
-    showToast(`User "${form.name.trim()}" created successfully!`);
+    try {
+      await authAPI.createUser({
+        fullName:    form.fullName.trim(),
+        email:       form.email.trim(),
+        phoneNumber: form.phoneNumber.trim(),
+        role:        form.role,
+        password:    form.password,
+      });
+      await loadUsers();
+      setForm(EMPTY);
+      setErrors({});
+      setView("table");
+      showToast(`User "${form.fullName.trim()}" created successfully!`);
+    } catch (err) {
+      const msg = err.response?.data?.message || "Failed to create user.";
+      setErrors((e) => ({ ...e, api: msg }));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDelete(row) {
+    if (!window.confirm(`Delete user "${row.fullName}"?`)) return;
+    try {
+      await authAPI.deleteUser(row._id);
+      await loadUsers();
+      showToast(`User "${row.fullName}" deleted.`);
+    } catch (err) {
+      showToast(err.response?.data?.message || "Delete failed.");
+    }
+  }
+
+  if (fetching) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="animate-spin text-blue-500" size={28} />
+        <span className="ml-3 text-slate-500">Loading users...</span>
+      </div>
+    );
+  }
+
+  if (fetchErr) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-red-700 flex items-center gap-2">
+        <AlertCircle size={18} /> {fetchErr}
+        <button onClick={loadUsers} className="ml-4 underline text-sm">Retry</button>
+      </div>
+    );
   }
 
   return (
@@ -189,15 +192,11 @@ export default function UsersPage() {
           columns={COLUMNS}
           data={users}
           filters={FILTERS}
-          searchKeys={["id", "name", "email", "phone", "role", "status"]}
+          searchKeys={["userId", "fullName", "email", "phoneNumber", "role"]}
           addLabel="Add User"
           addIcon={<UserPlus className="w-4 h-4" strokeWidth={2.5} />}
-          onAddClick={() => {
-            setForm(EMPTY);
-            setErrors({});
-            setView("create");
-          }}
-          rowsPerPage={5}
+          onAddClick={() => { setForm(EMPTY); setErrors({}); setView("create"); }}
+          rowsPerPage={10}
           emptyMessage="No users found."
         />
       ) : (
@@ -207,13 +206,18 @@ export default function UsersPage() {
           onBack={() => setView("table")}
         >
           <form onSubmit={handleSubmit} noValidate>
+            {errors.api && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+                {errors.api}
+              </div>
+            )}
             <FormGrid>
-              <FormField label="Full Name" required error={errors.name}>
+              <FormField label="Full Name" required error={errors.fullName}>
                 <FormInput
                   placeholder="e.g. Ahmed Khan"
-                  value={form.name}
-                  onChange={(e) => field("name", e.target.value)}
-                  error={errors.name}
+                  value={form.fullName}
+                  onChange={(e) => field("fullName", e.target.value)}
+                  error={errors.fullName}
                   autoFocus
                 />
               </FormField>
@@ -228,13 +232,13 @@ export default function UsersPage() {
                 />
               </FormField>
 
-              <FormField label="Phone Number" required error={errors.phone}>
+              <FormField label="Phone Number" error={errors.phoneNumber}>
                 <FormInput
                   type="tel"
                   placeholder="+92 300 1234567"
-                  value={form.phone}
-                  onChange={(e) => field("phone", e.target.value)}
-                  error={errors.phone}
+                  value={form.phoneNumber}
+                  onChange={(e) => field("phoneNumber", e.target.value)}
+                  error={errors.phoneNumber}
                 />
               </FormField>
 
@@ -245,10 +249,8 @@ export default function UsersPage() {
                   error={errors.role}
                 >
                   <option value="">Select role</option>
-                  {ROLES.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
+                  {ROLE_OPTIONS.map((r) => (
+                    <option key={r.value} value={r.value}>{r.label}</option>
                   ))}
                 </FormSelect>
               </FormField>
@@ -263,11 +265,7 @@ export default function UsersPage() {
                 />
               </FormField>
 
-              <FormField
-                label="Confirm Password"
-                required
-                error={errors.confirm}
-              >
+              <FormField label="Confirm Password" required error={errors.confirm}>
                 <FormPasswordInput
                   placeholder="Confirm password"
                   value={form.confirm}
@@ -288,17 +286,14 @@ export default function UsersPage() {
         </FormPage>
       )}
 
-      {/* ── Toast notification ── */}
+      {/* Toast notification */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white border border-emerald-200 shadow-xl rounded-xl px-5 py-3.5 animate-slide-up max-w-sm">
           <div className="w-7 h-7 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
             <Check className="w-4 h-4 text-emerald-500" strokeWidth={2.5} />
           </div>
           <p className="text-sm text-slate-700 flex-1">{toast}</p>
-          <button
-            onClick={() => setToast("")}
-            className="text-slate-400 hover:text-slate-600"
-          >
+          <button onClick={() => setToast("")} className="text-slate-400 hover:text-slate-600">
             <X className="w-4 h-4" strokeWidth={2} />
           </button>
         </div>

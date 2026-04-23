@@ -1,0 +1,14 @@
+[2026-04-18 19:05:49] ERROR: Failed to create audit log: AuditLog validation failed: performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-18 19:07:51] ERROR: Failed to create audit log: AuditLog validation failed: performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-18 19:15:47] ERROR: Failed to create audit log: AuditLog validation failed: performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-19 13:27:01] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required.
+[2026-04-19 13:32:16] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required.
+[2026-04-19 13:46:17] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-19 13:51:51] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-19 14:04:39] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-19 14:09:40] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-19 19:03:39] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-19 19:28:59] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-19 19:30:34] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-19 19:33:48] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-19 19:34:14] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.

@@ -1,37 +1,13 @@
-import { Eye, RefreshCw, XCircle } from "lucide-react";
-import { useState } from "react";
+import { Eye, RefreshCw, XCircle, Plus, Loader2, AlertCircle, Check, X } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 import DataTable from "../../components/common/DataTable";
 import FormPage, {
-  FormGrid,
-  FormField,
-  FormInput,
-  FormActions,
-  FormSubmitButton,
-  FormCancelButton,
+  FormGrid, FormField, FormInput, FormSelect,
+  FormActions, FormSubmitButton, FormCancelButton,
 } from "../../components/common/FormPage";
+import { bookingsAPI, projectsAPI, clientsAPI, flatsAPI } from "../../utils/apiService";
 
-const SAMPLE_DATA = [
-  { id: "BKG-00012", project: "Ottoman Heights", unit: "108", client: "Sameer Shaikh",  bookingDate: "31/03/2026", price: 3000000,  paymentPlan: "Installments", status: "Active"    },
-  { id: "BKG-00011", project: "Ottoman Heights", unit: "401", client: "Samantha Hurst", bookingDate: "31/03/2026", price: 5000000,  paymentPlan: "Installments", status: "Active"    },
-  { id: "BKG-00010", project: "Cevher",          unit: "401", client: "Nadeem Baig",    bookingDate: "19/03/2026", price: 27500000, paymentPlan: "Full Payment", status: "Completed" },
-  { id: "BKG-00009", project: "Cevher",          unit: "301", client: "Syed Faraz Ali", bookingDate: "19/03/2026", price: 30000000, paymentPlan: "Installments", status: "Active"    },
-  { id: "BKG-00008", project: "Ottoman Heights", unit: "205", client: "Jameel Khan",    bookingDate: "15/03/2026", price: 8000000,  paymentPlan: "Installments", status: "Active"    },
-  { id: "BKG-00007", project: "Cevher",          unit: "102", client: "Nadeem Shaikh",  bookingDate: "10/03/2026", price: 12000000, paymentPlan: "Full Payment", status: "Completed" },
-  { id: "BKG-00006", project: "Ottoman Heights", unit: "307", client: "Arif Hussain",   bookingDate: "05/03/2026", price: 4500000,  paymentPlan: "Installments", status: "Pending"   },
-  { id: "BKG-00005", project: "Cevher",          unit: "203", client: "Fatima Malik",   bookingDate: "28/02/2026", price: 18000000, paymentPlan: "Installments", status: "Active"    },
-  { id: "BKG-00004", project: "Ottoman Heights", unit: "110", client: "Omar Sheikh",    bookingDate: "20/02/2026", price: 6500000,  paymentPlan: "Full Payment", status: "Completed" },
-  { id: "BKG-00003", project: "Cevher",          unit: "404", client: "Hina Qureshi",   bookingDate: "15/02/2026", price: 22000000, paymentPlan: "Installments", status: "Active"    },
-  { id: "BKG-00002", project: "Ottoman Heights", unit: "502", client: "Bilal Ahmed",    bookingDate: "10/02/2026", price: 9000000,  paymentPlan: "Installments", status: "Pending"   },
-  { id: "BKG-00001", project: "Cevher",          unit: "101", client: "Saima Noor",     bookingDate: "01/02/2026", price: 15000000, paymentPlan: "Full Payment", status: "Completed" },
-];
-
-const PROJECTS      = ["Ottoman Heights", "Cevher"];
-const PAYMENT_PLANS = ["Installments", "Full Payment"];
-const STATUSES      = ["Active", "Pending", "Completed"];
-
-const EMPTY_FORM = {
-  project: "", unit: "", client: "", bookingDate: "", price: "", paymentPlan: "", status: "Active",
-};
+const PAYMENT_PLANS = ["Installments", "Full Payment", "Lump Sum"];
 
 function formatPrice(amount) {
   return `Rs ${Number(amount).toLocaleString("en-PK", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -39,37 +15,26 @@ function formatPrice(amount) {
 
 function StatusBadge({ status }) {
   const styles = {
-    Active:    "bg-green-50 text-green-700 border border-green-200",
-    Pending:   "bg-yellow-50 text-yellow-700 border border-yellow-200",
-    Completed: "bg-blue-50 text-blue-700 border border-blue-200",
+    active:      "bg-green-50 text-green-700 border border-green-200",
+    pending:     "bg-yellow-50 text-yellow-700 border border-yellow-200",
+    completed:   "bg-blue-50 text-blue-700 border border-blue-200",
+    cancelled:   "bg-red-50 text-red-700 border border-red-200",
+    transferred: "bg-purple-50 text-purple-700 border border-purple-200",
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status] ?? "bg-slate-100 text-slate-600"}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${styles[status] ?? "bg-slate-100 text-slate-600"}`}>
       {status}
     </span>
   );
 }
 
 function ActionCell({ row, onCancel }) {
-  const done = row.status === "Completed";
+  const done = row.status === "completed" || row.status === "cancelled";
   return (
     <div className="flex items-center gap-0.5">
-      <button
-        onClick={() => alert(`View: ${row.id}`)}
-        className="p-1.5 rounded text-[#1a6fa8] hover:bg-blue-50 transition-colors"
-        title="View"
-      >
+      <button className="p-1.5 rounded text-[#1a6fa8] hover:bg-blue-50 transition-colors" title="View">
         <Eye className="w-4 h-4" />
       </button>
-      {!done && (
-        <button
-          onClick={() => alert(`Transfer: ${row.id}`)}
-          className="p-1.5 rounded text-amber-500 hover:bg-amber-50 transition-colors"
-          title="Transfer"
-        >
-          <RefreshCw className="w-4 h-4" />
-        </button>
-      )}
       {!done && (
         <button
           onClick={() => onCancel(row)}
@@ -83,24 +48,28 @@ function ActionCell({ row, onCancel }) {
   );
 }
 
-function AddBookingForm({ onBack, onSubmit }) {
-  const [form, setForm]       = useState(EMPTY_FORM);
-  const [errors, setErrors]   = useState({});
+const EMPTY_FORM = { project: "", flat: "", client: "", bookingDate: "", bookingPrice: "", paymentPlan: "" };
+
+function AddBookingForm({ onBack, onSubmit, projects, clients, flats }) {
+  const [form, setForm]     = useState(EMPTY_FORM);
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const set = (key) => (e) => {
-    setForm((f) => ({ ...f, [key]: e.target.value }));
-    setErrors((er) => ({ ...er, [key]: undefined }));
-  };
+  // Filter available flats by selected project
+  const availableFlats = flats.filter(
+    (f) => f.status === "available" && (!form.project || f.project?._id === form.project || f.project === form.project)
+  );
+
+  const set = (key) => (e) => { setForm((f) => ({ ...f, [key]: e.target.value })); setErrors((er) => ({ ...er, [key]: undefined })); };
 
   const validate = () => {
     const e = {};
-    if (!form.project)     e.project     = "Project is required";
-    if (!form.unit)        e.unit        = "Unit is required";
-    if (!form.client)      e.client      = "Client is required";
-    if (!form.bookingDate) e.bookingDate = "Booking date is required";
-    if (!form.price)       e.price       = "Price is required";
-    if (!form.paymentPlan) e.paymentPlan = "Payment plan is required";
+    if (!form.project)      e.project      = "Project is required";
+    if (!form.flat)         e.flat         = "Unit is required";
+    if (!form.client)       e.client       = "Client is required";
+    if (!form.bookingDate)  e.bookingDate  = "Booking date is required";
+    if (!form.bookingPrice) e.bookingPrice = "Price is required";
+    if (!form.paymentPlan)  e.paymentPlan  = "Payment plan is required";
     return e;
   };
 
@@ -109,63 +78,60 @@ function AddBookingForm({ onBack, onSubmit }) {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    onSubmit(form);
+    try {
+      await onSubmit({ ...form, bookingPrice: Number(form.bookingPrice) });
+    } catch (err) {
+      setErrors({ api: err.response?.data?.message || "Failed to create booking." });
+      setLoading(false);
+    }
   };
-
-  const selectClass = (hasError) =>
-    `w-full px-4 py-3 rounded-lg border ${hasError ? "border-red-400" : "border-slate-200"} bg-white text-sm
-     text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`;
 
   return (
     <FormPage title="New Booking" subtitle="Create a new flat booking" onBack={onBack}>
       <form onSubmit={handleSubmit} noValidate>
+        {errors.api && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{errors.api}</div>}
         <FormGrid>
           <FormField label="Project" required error={errors.project}>
-            <select value={form.project} onChange={set("project")} className={selectClass(errors.project)}>
+            <FormSelect value={form.project} onChange={set("project")} error={errors.project}>
               <option value="">Select project…</option>
-              {PROJECTS.map((p) => <option key={p}>{p}</option>)}
-            </select>
-            {errors.project && <p className="text-red-500 text-xs mt-0.5">{errors.project}</p>}
+              {projects.map((p) => <option key={p._id} value={p._id}>{p.name}</option>)}
+            </FormSelect>
           </FormField>
 
-          <FormField label="Unit / Flat No." required error={errors.unit}>
-            <FormInput placeholder="e.g. 108" value={form.unit} onChange={set("unit")} error={errors.unit} />
+          <FormField label="Unit / Flat" required error={errors.flat}>
+            <FormSelect value={form.flat} onChange={set("flat")} error={errors.flat}>
+              <option value="">Select available unit…</option>
+              {availableFlats.map((f) => (
+                <option key={f._id} value={f._id}>{f.flatNumber} – Floor {f.floor}</option>
+              ))}
+            </FormSelect>
           </FormField>
 
           <FormField label="Client" required error={errors.client}>
-            <FormInput placeholder="e.g. Nadeem Baig" value={form.client} onChange={set("client")} error={errors.client} />
+            <FormSelect value={form.client} onChange={set("client")} error={errors.client}>
+              <option value="">Select client…</option>
+              {clients.map((c) => <option key={c._id} value={c._id}>{c.name} ({c.clientId})</option>)}
+            </FormSelect>
           </FormField>
 
           <FormField label="Booking Date" required error={errors.bookingDate}>
             <FormInput type="date" value={form.bookingDate} onChange={set("bookingDate")} error={errors.bookingDate} />
           </FormField>
 
-          <FormField label="Price (Rs)" required error={errors.price}>
-            <FormInput type="number" placeholder="e.g. 5000000" value={form.price} onChange={set("price")} error={errors.price} />
+          <FormField label="Booking Price (Rs)" required error={errors.bookingPrice}>
+            <FormInput type="number" placeholder="e.g. 5000000" value={form.bookingPrice} onChange={set("bookingPrice")} error={errors.bookingPrice} />
           </FormField>
 
           <FormField label="Payment Plan" required error={errors.paymentPlan}>
-            <select value={form.paymentPlan} onChange={set("paymentPlan")} className={selectClass(errors.paymentPlan)}>
+            <FormSelect value={form.paymentPlan} onChange={set("paymentPlan")} error={errors.paymentPlan}>
               <option value="">Select plan…</option>
-              {PAYMENT_PLANS.map((p) => <option key={p}>{p}</option>)}
-            </select>
-            {errors.paymentPlan && <p className="text-red-500 text-xs mt-0.5">{errors.paymentPlan}</p>}
-          </FormField>
-
-          <FormField label="Status">
-            <select value={form.status} onChange={set("status")} className={selectClass(false)}>
-              {STATUSES.map((s) => <option key={s}>{s}</option>)}
-            </select>
+              {PAYMENT_PLANS.map((p) => <option key={p} value={p}>{p}</option>)}
+            </FormSelect>
           </FormField>
         </FormGrid>
-
         <FormActions>
           <FormCancelButton onClick={onBack} />
-          <FormSubmitButton loading={loading ? "Saving..." : null}>
-            Add Booking
-          </FormSubmitButton>
+          <FormSubmitButton loading={loading ? "Saving..." : null}>Add Booking</FormSubmitButton>
         </FormActions>
       </form>
     </FormPage>
@@ -173,66 +139,149 @@ function AddBookingForm({ onBack, onSubmit }) {
 }
 
 const COLUMNS = [
-  { key: "id",          label: "Booking Number", sortable: true },
-  { key: "project",     label: "Project",        sortable: true },
-  { key: "unit",        label: "Unit",           sortable: true },
-  { key: "client",      label: "Client",         sortable: true },
-  { key: "bookingDate", label: "Booking Date",   sortable: true },
+  { key: "bookingNumber", label: "Booking #",    sortable: true },
+  { key: "project",       label: "Project",      sortable: true, render: (v) => v?.name || "-" },
+  { key: "flat",          label: "Unit",         sortable: true, render: (v) => v?.flatNumber || "-" },
+  { key: "client",        label: "Client",       sortable: true, render: (v) => v?.name || "-" },
   {
-    key: "price",
+    key: "bookingDate",
+    label: "Booking Date",
+    sortable: true,
+    render: (v) => v ? new Date(v).toLocaleDateString("en-GB") : "-",
+  },
+  {
+    key: "bookingPrice",
     label: "Price",
     sortable: true,
-    render: (val) => <span className="font-semibold text-slate-800">{formatPrice(val)}</span>,
+    render: (v) => <span className="font-semibold text-slate-800">{formatPrice(v)}</span>,
   },
-  { key: "paymentPlan", label: "Payment Plan",   sortable: true },
-  {
-    key: "status",
-    label: "Status",
-    sortable: true,
-    render: (val) => <StatusBadge status={val} />,
-  },
-  {
-    key: "actions",
-    label: "Actions",
-    sortable: false,
-    render: (_, row) => (
-      <ActionCell
-        row={row}
-        onCancel={() => { if (window.confirm(`Cancel booking ${row.id}?`)) alert(`Cancelled: ${row.id}`); }}
-      />
-    ),
-  },
+  { key: "paymentPlan", label: "Payment Plan", sortable: true },
+  { key: "status",      label: "Status",       sortable: true, render: (v) => <StatusBadge status={v} /> },
+];
+
+const STATUS_FILTERS = [
+  { key: "status", options: [
+    { value: "",            label: "All statuses" },
+    { value: "active",      label: "Active" },
+    { value: "completed",   label: "Completed" },
+    { value: "cancelled",   label: "Cancelled" },
+    { value: "transferred", label: "Transferred" },
+  ]},
 ];
 
 export default function BookingsPage() {
-  const [view, setView] = useState("list");
+  const [view,     setView]     = useState("list");
+  const [bookings, setBookings] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [clients,  setClients]  = useState([]);
+  const [flats,    setFlats]    = useState([]);
+  const [fetching, setFetching] = useState(true);
+  const [fetchErr, setFetchErr] = useState("");
+  const [toast,    setToast]    = useState("");
 
-  if (view === "add") {
-    return (
-      <div className="p-6 w-full min-w-0">
-        <AddBookingForm
-          onBack={() => setView("list")}
-          onSubmit={(data) => { console.log("New booking:", data); setView("list"); }}
-        />
-      </div>
-    );
-  }
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 3500); };
+
+  const loadData = useCallback(async () => {
+    setFetching(true);
+    setFetchErr("");
+    try {
+      const [bRes, pRes, cRes, fRes] = await Promise.all([
+        bookingsAPI.getAll(1, 200),
+        projectsAPI.getAll(1, 100),
+        clientsAPI.getAll(1, 200),
+        flatsAPI.getAll(1, 500),
+      ]);
+      setBookings(bRes.data.data || []);
+      setProjects(pRes.data.data || []);
+      setClients(cRes.data.data || []);
+      setFlats(fRes.data.data || []);
+    } catch (err) {
+      setFetchErr(err.response?.data?.message || "Failed to load bookings.");
+    } finally {
+      setFetching(false);
+    }
+  }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const handleAddSubmit = async (form) => {
+    await bookingsAPI.create(form);
+    await loadData();
+    setView("list");
+    showToast("Booking created successfully!");
+  };
+
+  const handleCancel = async (row) => {
+    const reason = window.prompt(`Cancel booking ${row.bookingNumber}?\nReason (optional):`);
+    if (reason === null) return; // user pressed Cancel on prompt
+    try {
+      await bookingsAPI.cancel(row._id, reason);
+      await loadData();
+      showToast(`Booking ${row.bookingNumber} cancelled.`);
+    } catch (err) {
+      showToast(err.response?.data?.message || "Cancel failed.");
+    }
+  };
+
+  const columnsWithActions = [
+    ...COLUMNS,
+    {
+      key: "actions",
+      label: "Actions",
+      sortable: false,
+      render: (_, row) => <ActionCell row={row} onCancel={handleCancel} />,
+    },
+  ];
+
+  if (fetching) return (
+    <div className="flex items-center justify-center h-64">
+      <Loader2 className="animate-spin text-blue-500" size={28} />
+      <span className="ml-3 text-slate-500">Loading bookings...</span>
+    </div>
+  );
+
+  if (fetchErr) return (
+    <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-red-700 flex items-center gap-2">
+      <AlertCircle size={18} /> {fetchErr}
+      <button onClick={loadData} className="ml-4 underline text-sm">Retry</button>
+    </div>
+  );
+
+  if (view === "add") return (
+    <AddBookingForm
+      onBack={() => setView("list")}
+      onSubmit={handleAddSubmit}
+      projects={projects}
+      clients={clients}
+      flats={flats}
+    />
+  );
 
   return (
-    <div className="overflow-y-hidden shrink-0">
+    <div>
       <DataTable
         title="Bookings"
         subtitle="Manage flat bookings & transfers"
-        columns={COLUMNS}
-        data={SAMPLE_DATA}
-        filters={[]}
-        searchKeys={["id", "project", "unit", "client", "paymentPlan", "status"]}
+        columns={columnsWithActions}
+        data={bookings}
+        filters={STATUS_FILTERS}
+        searchKeys={["bookingNumber", "paymentPlan", "status"]}
         onAddClick={() => setView("add")}
         addLabel="+ New Booking"
-        addIcon={null}
-        rowsPerPage={8}
+        addIcon={<Plus className="w-4 h-4" />}
+        rowsPerPage={10}
         emptyMessage="No bookings found."
       />
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white border border-emerald-200 shadow-xl rounded-xl px-5 py-3.5 max-w-sm">
+          <div className="w-7 h-7 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+            <Check className="w-4 h-4 text-emerald-500" strokeWidth={2.5} />
+          </div>
+          <p className="text-sm text-slate-700 flex-1">{toast}</p>
+          <button onClick={() => setToast("")} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+        </div>
+      )}
     </div>
   );
 }
