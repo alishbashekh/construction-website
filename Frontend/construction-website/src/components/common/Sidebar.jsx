@@ -13,7 +13,7 @@ import {
   BarChart2,
   ChevronDown,
   LogOut,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 const REPORT_ROUTES = [
   "/reports/sales-summary",
@@ -31,7 +31,8 @@ const REPORT_LINKS = [
   { to: "/reports/client-ledger", label: "Client Ledger" },
 ];
 
-const base = "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 cursor-pointer text-sm font-bold w-full";
+const base =
+  "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 cursor-pointer text-sm font-bold w-full";
 const active = "bg-[#1a6fa8] text-white";
 const inactive = "text-slate-200 hover:bg-white/10 hover:text-white";
 
@@ -48,7 +49,9 @@ function LogoutModal({ onConfirm, onCancel }) {
           <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 mb-4">
             <AlertCircle size={40} />
           </div>
-          <h2 className="text-lg font-extrabold text-slate-800 mb-1">Confirm Logout</h2>
+          <h2 className="text-lg font-extrabold text-slate-800 mb-1">
+            Confirm Logout
+          </h2>
           <p className="text-sm text-slate-500 mb-6">
             Are you sure you want to log out? Any unsaved changes may be lost.
           </p>
@@ -78,10 +81,12 @@ function LogoutModal({ onConfirm, onCancel }) {
   );
 }
 
-export default function Sidebar({ onLogout }) {
+export default function Sidebar({ onLogout, user }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const isReportActive = REPORT_ROUTES.some((r) => location.pathname.startsWith(r));
+  const isReportActive = REPORT_ROUTES.some((r) =>
+    location.pathname.startsWith(r),
+  );
   const [reportsOpen, setReportsOpen] = useState(isReportActive);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -108,20 +113,39 @@ export default function Sidebar({ onLogout }) {
           </p>
           <ul className="space-y-0.5">
             <li>
-              <NavLink to="/dashboard" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
                 <LayoutDashboard size={20} /> Dashboard
               </NavLink>
             </li>
-            <li>
-              <NavLink to="/users" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
-                <Users size={20} /> Users
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/logs" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
-                <FileText size={20} /> Logs
-              </NavLink>
-            </li>
+            {user?.role === "system_admin" && (
+              <>
+                <li>
+                  <NavLink
+                    to="/users"
+                    className={({ isActive }) =>
+                      `${base} ${isActive ? active : inactive}`
+                    }
+                  >
+                    <Users size={20} /> Users
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/logs"
+                    className={({ isActive }) =>
+                      `${base} ${isActive ? active : inactive}`
+                    }
+                  >
+                    <FileText size={20} /> Logs
+                  </NavLink>
+                </li>
+              </>
+            )}
           </ul>
         </div>
 
@@ -132,27 +156,52 @@ export default function Sidebar({ onLogout }) {
           </p>
           <ul className="space-y-0.5">
             <li>
-              <NavLink to="/projects" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink
+                to="/projects"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
                 <Folder size={20} /> Projects
               </NavLink>
             </li>
             <li>
-              <NavLink to="/flats" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink
+                to="/flats"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
                 <Home size={20} /> Flats / Units
               </NavLink>
             </li>
             <li>
-              <NavLink to="/clients" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink
+                to="/clients"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
                 <User size={20} /> Clients
               </NavLink>
             </li>
             <li>
-              <NavLink to="/bookings" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink
+                to="/bookings"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
                 <Calendar size={20} /> Bookings
               </NavLink>
             </li>
             <li>
-              <NavLink to="/payments" className={({ isActive }) => `${base} ${isActive ? active : inactive}`}>
+              <NavLink
+                to="/payments"
+                className={({ isActive }) =>
+                  `${base} ${isActive ? active : inactive}`
+                }
+              >
                 <CreditCard size={20} /> Client Payments
               </NavLink>
             </li>
@@ -170,7 +219,9 @@ export default function Sidebar({ onLogout }) {
                 <span className="flex items-center gap-3">
                   <BarChart2 size={20} /> Client Reports
                 </span>
-                <ChevronDown className={`transition-transform duration-200 ${reportsOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`transition-transform duration-200 ${reportsOpen ? "rotate-180" : ""}`}
+                />
               </button>
               {reportsOpen && (
                 <ul className="mt-0.5 ml-4 border-l border-white/15 pl-3 space-y-0.5">
@@ -180,7 +231,9 @@ export default function Sidebar({ onLogout }) {
                         to={link.to}
                         className={({ isActive }) =>
                           `block px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 ${
-                            isActive ? "bg-[#1a6fa8] text-white" : "text-slate-300 hover:bg-white/10 hover:text-white"
+                            isActive
+                              ? "bg-[#1a6fa8] text-white"
+                              : "text-slate-300 hover:bg-white/10 hover:text-white"
                           }`
                         }
                       >
@@ -206,7 +259,10 @@ export default function Sidebar({ onLogout }) {
       </div>
 
       {showLogoutModal && (
-        <LogoutModal onCancel={() => setShowLogoutModal(false)} onConfirm={handleLogoutConfirm} />
+        <LogoutModal
+          onCancel={() => setShowLogoutModal(false)}
+          onConfirm={handleLogoutConfirm}
+        />
       )}
     </div>
   );
