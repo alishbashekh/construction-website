@@ -114,3 +114,6 @@
 [2026-04-23 12:14:11] INFO: MongoDB connected: localhost
 [2026-04-23 12:14:11] INFO: Database connected
 [2026-04-23 12:14:11] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-23 12:14:34] INFO: MongoDB connected: localhost
+[2026-04-23 12:14:34] INFO: Database connected
+[2026-04-23 12:14:34] INFO: Server running on http://localhost:3000/api/v1
