@@ -124,7 +124,7 @@ const Dashboard = () => {
               : item.value;
 
           return (
-            <div key={i} className="bg-white p-5 rounded-xl border shadow-sm">
+            <div key={i} className="bg-slate-50 p-5 rounded-xl shadow-xl">
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-slate-500">{item.title}</p>
@@ -143,7 +143,7 @@ const Dashboard = () => {
       {/* CHART SECTION */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Units Status */}
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
+        <div className="bg-slate-100 p-6 rounded-xl shadow-xl">
           <h3 className="font-semibold text-lg">Units Status</h3>
           <p className="text-sm text-slate-500 mb-4">Current inventory breakdown</p>
           <div className="space-y-3">
@@ -169,7 +169,7 @@ const Dashboard = () => {
         </div>
 
         {/* Revenue Chart Placeholder */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-xl border shadow-sm">
+        <div className="lg:col-span-2 bg-slate-100 p-6 rounded-xl shadow-xl">
           <h3 className="font-semibold text-lg">Revenue & Bookings Trend</h3>
           <p className="text-sm text-slate-500 mb-4">Last 6 months performance</p>
           <div className="h-48 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 text-sm">
@@ -181,7 +181,7 @@ const Dashboard = () => {
       {/* BOTTOM SECTION */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* RECENT ACTIVITIES */}
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
+        <div className="bg-slate-50 p-6 rounded-xl shadow-xl">
           <h3 className="font-semibold text-lg">Recent Activities</h3>
           <p className="text-sm text-slate-500 mb-4">Latest updates</p>
 
@@ -211,7 +211,7 @@ const Dashboard = () => {
         </div>
 
         {/* TOP CLIENTS */}
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
+        <div className="bg-slate-50 p-6 rounded-xl shadow-xl">
           <h3 className="font-semibold text-lg">Top Clients</h3>
           <p className="text-sm text-slate-500 mb-4">By total investment</p>
 

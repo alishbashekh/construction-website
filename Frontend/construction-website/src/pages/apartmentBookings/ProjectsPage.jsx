@@ -39,7 +39,7 @@ function CopyableId({ id }) {
 }
 
 const COLUMNS = [
-  { key: "projectId",  label: "Project ID",   sortable: true, render: (v) => <CopyableId id={v} /> },
+  { key: "_id",  label: "Project ID",   sortable: true, render: (v) => <CopyableId id={v} /> },
   { key: "name",       label: "Project Name", sortable: true },
   { key: "location",   label: "Location",     sortable: true },
   { key: "totalFloors",label: "Floors",       sortable: true },

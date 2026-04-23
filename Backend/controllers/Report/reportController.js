@@ -117,6 +117,60 @@ class ReportController extends BaseController {
       return this.handleError(next, error.message, 500);
     }
   };
+  // 5. PAYMENT COLLECTION REPORT
+  paymentCollection = async (req, res, next) => {
+  try {
+    const { project, mode, fromDate, toDate } = req.query;
+
+    let filter = { deletedAt: null };
+
+    // Filter by payment mode
+    if (mode) filter.mode = mode;
+
+    // Date filtering
+    if (fromDate || toDate) {
+      filter.createdAt = {};
+      if (fromDate) filter.createdAt.$gte = new Date(fromDate);
+      if (toDate) filter.createdAt.$lte = new Date(toDate);
+    }
+
+    // Get payments + populate booking -> client + flat + project
+    const payments = await Payment.find(filter)
+      .populate({
+        path: "booking",
+        populate: [
+          { path: "client", select: "name cnic" },
+          { path: "flat", select: "flatNumber" },
+          { path: "project", select: "name" },
+        ],
+      });
+
+    // Optional project filter (after populate)
+    let filtered = payments;
+    if (project) {
+      filtered = payments.filter(
+        (p) => p.booking?.project?.name === project
+      );
+    }
+
+    // Format response SAME as frontend expects
+    const data = filtered.map((p) => ({
+      receipt: p.receiptNo || p._id,
+      client: p.booking?.client?.name,
+      cnic: p.booking?.client?.cnic,
+      project: p.booking?.project?.name,
+      unit: p.booking?.flat?.flatNumber,
+      date: new Date(p.createdAt).toLocaleDateString("en-GB"),
+      mode: p.mode,
+      amount: p.amount,
+    }));
+
+    return res.status(200).json({ data });
+
+  } catch (error) {
+    return this.handleError(next, error.message, 500);
+  }
+  };
 }
 
 export default new ReportController();

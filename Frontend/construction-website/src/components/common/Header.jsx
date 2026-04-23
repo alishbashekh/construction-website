@@ -19,15 +19,7 @@ const Header = ({ toggleSidebar, user }) => {
 
         {/* Right Side */}
         <div className="flex items-center gap-3">
-          {/* Notification */}
-          <button className="relative inline-flex items-center justify-center w-10 h-10 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all duration-200 group">
-            <BellIcon
-              size={20}
-              strokeWidth={2}
-              className="group-hover:scale-110 transition-transform duration-200"
-            />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white"></span>
-          </button>
+         
 
           {/* User Profile */}
           <div className="flex items-center gap-3 pl-3 border-l border-slate-200/60">

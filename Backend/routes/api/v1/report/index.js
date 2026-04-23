@@ -33,4 +33,11 @@ router.get(
   ReportController.vendorLedger,
 );
 
+// 6. payment collection
+router.get(
+  "/payment-collection",
+  checkRole("system_admin", "accounts_officer"),
+  ReportController.paymentCollection
+);
+
 export default router;

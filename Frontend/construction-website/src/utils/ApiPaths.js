@@ -36,7 +36,7 @@ const ApiPaths = {
 
   // Reports
   REPORT_SALES: "/report/sales-summary",
-  REPORT_FLATS_AVAIL: "/report/flats-availability",
+  REPORT_FLATS_AVAIL: "/report/flat-availability",
   REPORT_CLIENT_DUES: "/report/client-dues",
   REPORT_PAYMENTS: "/report/payment-collection",
   REPORT_LEDGER: (clientId) => `/report/client-ledger/${clientId}`,

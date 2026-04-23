@@ -25,8 +25,11 @@ const PaymentSchema = new mongoose.Schema(
 
     // payment info
     amount: { type: Number, required: true },
-    type: { type: String, default: "regular" },
+    type: { type: String, enum: ["regular", "advance", "adjustment"], default: "regular" },
     paymentMode: { type: String, required: true }, // cash, bank, etc.
+
+    // refund flag — was missing, caused controller logic to break
+    isRefund: { type: Boolean, default: false },
 
     // extra info
     paymentDate: { type: Date, default: Date.now },
@@ -38,13 +41,12 @@ const PaymentSchema = new mongoose.Schema(
   { timestamps: true }, // adds createdAt and updatedAt automatically
 );
 
-// This runs before saving a new payment to make a receipt number
-PaymentSchema.pre("save", async function (next) {
+// Runs before saving — generates receipt number safely
+PaymentSchema.pre("save", async function () {
   if (!this.receiptNumber) {
     const count = await mongoose.model("Payment").countDocuments();
-    this.receiptNumber = `PAY-${count + 1}`; // Simple format: PAY-1, PAY-2
+    this.receiptNumber = `PAY-${count + 1}`;
   }
-  next();
 });
 
 const Payment = mongoose.model("Payment", PaymentSchema);

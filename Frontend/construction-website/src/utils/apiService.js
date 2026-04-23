@@ -113,7 +113,7 @@ export const reportsAPI = {
   },
   flatsAvailability: (params = {}) => {
     const query = new URLSearchParams(params).toString();
-    return api.get(`/report/flats-availability?${query}`);
+    return api.get(`/report/flat-availability?${query}`);
   },
   clientDues: (params = {}) => {
     const query = new URLSearchParams(params).toString();
@@ -123,10 +123,10 @@ export const reportsAPI = {
     const query = new URLSearchParams(params).toString();
     return api.get(`/report/payment-collection?${query}`);
   },
-  clientLedger: (clientId, params = {}) => {
-    const query = new URLSearchParams(params).toString();
-    return api.get(`/report/client-ledger/${clientId}?${query}`);
-  },
+ clientLedger: (clientId, params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return api.get(`/client/${clientId}/ledger?${query}`);
+},
 };
 
 export default api;

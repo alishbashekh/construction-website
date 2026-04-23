@@ -14,9 +14,14 @@ const isUser = async (req, res, next) => {
 
     // 3. Attach user info to the request so controllers can use it
     req.user = decoded;
+  
+      // 🔥 ADD THIS LINE
+    console.log("🔥 DECODED USER:", req.user);
+
 
     next(); // Move to the next step
   } catch (error) {
+    console.log("JWT ERROR:", error.message);
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
