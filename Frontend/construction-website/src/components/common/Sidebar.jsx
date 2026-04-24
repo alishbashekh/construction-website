@@ -16,19 +16,19 @@ import {
   AlertCircle,
 } from "lucide-react";
 const REPORT_ROUTES = [
-  "/reports/sales-summary",
-  "/reports/flats-availability",
-  "/reports/client-dues",
-  "/reports/payment-collection",
-  "/reports/client-ledger",
+   "/dashboard/reports/sales-summary",
+  "/dashboard/reports/flats-availability",
+  "/dashboard/reports/client-dues",
+  "/dashboard/reports/payment-collection",
+  "/dashboard/reports/client-ledger",
 ];
 
 const REPORT_LINKS = [
-  { to: "/reports/sales-summary", label: "Sales Summary" },
-  { to: "/reports/flats-availability", label: "Flats Availability" },
-  { to: "/reports/client-dues", label: "Client Dues" },
-  { to: "/reports/payment-collection", label: "Payment Collection" },
-  { to: "/reports/client-ledger", label: "Client Ledger" },
+  { to: "/dashboard/reports/sales-summary", label: "Sales Summary" },
+  { to: "/dashboard/reports/flats-availability", label: "Flats Availability" },
+  { to: "/dashboard/reports/client-dues", label: "Client Dues" },
+  { to: "/dashboard/reports/payment-collection", label: "Payment Collection" },
+  { to: "/dashboard/reports/client-ledger", label: "Client Ledger" },
 ];
 
 const base =
@@ -126,7 +126,7 @@ export default function Sidebar({ onLogout, user }) {
               <>
                 <li>
                   <NavLink
-                    to="/users"
+                    to="/dashboard/users"
                     className={({ isActive }) =>
                       `${base} ${isActive ? active : inactive}`
                     }
@@ -136,7 +136,7 @@ export default function Sidebar({ onLogout, user }) {
                 </li>
                 <li>
                   <NavLink
-                    to="/logs"
+                    to="/dashboard/logs"
                     className={({ isActive }) =>
                       `${base} ${isActive ? active : inactive}`
                     }
@@ -157,7 +157,7 @@ export default function Sidebar({ onLogout, user }) {
           <ul className="space-y-0.5">
             <li>
               <NavLink
-                to="/projects"
+                to="/dashboard/projects"
                 className={({ isActive }) =>
                   `${base} ${isActive ? active : inactive}`
                 }
@@ -167,7 +167,7 @@ export default function Sidebar({ onLogout, user }) {
             </li>
             <li>
               <NavLink
-                to="/flats"
+                to="/dashboard/flats"
                 className={({ isActive }) =>
                   `${base} ${isActive ? active : inactive}`
                 }
@@ -177,7 +177,7 @@ export default function Sidebar({ onLogout, user }) {
             </li>
             <li>
               <NavLink
-                to="/clients"
+                to="/dashboard/clients"
                 className={({ isActive }) =>
                   `${base} ${isActive ? active : inactive}`
                 }
@@ -187,7 +187,7 @@ export default function Sidebar({ onLogout, user }) {
             </li>
             <li>
               <NavLink
-                to="/bookings"
+                to="/dashboard/bookings"
                 className={({ isActive }) =>
                   `${base} ${isActive ? active : inactive}`
                 }
@@ -197,7 +197,7 @@ export default function Sidebar({ onLogout, user }) {
             </li>
             <li>
               <NavLink
-                to="/payments"
+                to="/dashboard/payments"
                 className={({ isActive }) =>
                   `${base} ${isActive ? active : inactive}`
                 }

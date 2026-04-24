@@ -166,3 +166,11 @@
 [2026-04-24 13:26:29] INFO: MongoDB connected: ac-rsbwybx-shard-00-00.cbxaw7n.mongodb.net
 [2026-04-24 13:26:29] INFO: Database connected
 [2026-04-24 13:26:29] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-24 13:42:39] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required.
+[2026-04-24 13:43:27] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-24 13:44:08] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-24 13:45:04] ERROR: Failed to create audit log: AuditLog validation failed: performerRole: Path `performerRole` is required.
+[2026-04-24 13:45:46] ERROR: Failed to create audit log: AuditLog validation failed: performerRole: Path `performerRole` is required.
+[2026-04-24 13:46:13] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-24 13:53:42] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-24 13:56:49] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.

@@ -42,17 +42,18 @@ const App = () => {
               </ProtectedRoute>
             }
           >
-            {/* Redirect root → dashboard */}
-            <Route index element={<Navigate to="/dashboard" replace />} />
+           <Route index element={<Navigate to="/dashboard" replace />} />
 
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="users" element={<UserPage />} />
-            <Route path="logs" element={<LogsPage />} />
-            <Route path="projects" element={<ProjectsPage />} />
-            <Route path="flats" element={<FlatsPage />} />
-            <Route path="clients" element={<ClientsPage />} />
-            <Route path="bookings" element={<BookingsPage />} />
-            <Route path="payments" element={<ClientPayments />} />
+  {/* Dashboard parent — all sidebar pages live under /dashboard/* */}
+  <Route path="dashboard">
+    <Route index element={<Dashboard />} />
+    <Route path="users" element={<UserPage />} />
+    <Route path="logs" element={<LogsPage />} />
+    <Route path="projects" element={<ProjectsPage />} />
+    <Route path="flats" element={<FlatsPage />} />
+    <Route path="clients" element={<ClientsPage />} />
+    <Route path="bookings" element={<BookingsPage />} />
+    <Route path="payments" element={<ClientPayments />} />
 
             {/* Reports */}
             <Route path="reports/sales-summary" element={<SalesSummary />} />
@@ -60,6 +61,7 @@ const App = () => {
             <Route path="reports/client-dues" element={<ClientDues />} />
             <Route path="reports/payment-collection" element={<PaymentCollection />} />
             <Route path="reports/client-ledger" element={<ClientLedger />} />
+          </Route>
           </Route>
 
           {/* Catch-all */}
