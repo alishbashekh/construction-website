@@ -149,3 +149,20 @@
 [2026-04-23 19:27:40] INFO: Database connected
 [2026-04-23 19:27:40] INFO: Server running on http://localhost:3000/api/v1
 [2026-04-23 19:44:32] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required.
+[2026-04-23 20:10:14] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-23 20:11:03] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-23 20:12:06] ERROR: Failed to create audit log: AuditLog validation failed: performerRole: Path `performerRole` is required.
+[2026-04-23 20:12:57] ERROR: Failed to create audit log: AuditLog validation failed: performerRole: Path `performerRole` is required.
+[2026-04-23 20:13:42] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-23 20:23:45] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required.
+[2026-04-23 20:24:32] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-23 20:25:00] ERROR: Failed to create audit log: AuditLog validation failed: performedBy: Path `performedBy` is required., performerRole: Path `performerRole` is required., category: Path `category` is required.
+[2026-04-24 12:28:19] INFO: MongoDB connected: ac-rsbwybx-shard-00-00.cbxaw7n.mongodb.net
+[2026-04-24 12:28:19] INFO: Database connected
+[2026-04-24 12:28:19] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-24 12:41:56] INFO: MongoDB connected: ac-rsbwybx-shard-00-00.cbxaw7n.mongodb.net
+[2026-04-24 12:41:56] INFO: Database connected
+[2026-04-24 12:41:56] INFO: Server running on http://localhost:3000/api/v1
+[2026-04-24 13:26:29] INFO: MongoDB connected: ac-rsbwybx-shard-00-00.cbxaw7n.mongodb.net
+[2026-04-24 13:26:29] INFO: Database connected
+[2026-04-24 13:26:29] INFO: Server running on http://localhost:3000/api/v1

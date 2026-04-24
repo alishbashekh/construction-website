@@ -12,6 +12,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { dashboardAPI } from "../../utils/apiService";
+import TrendChart from "../../components/common/TrendChart";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatCurrency(amount) {
@@ -101,7 +102,13 @@ const Dashboard = () => {
     );
   }
 
-  const { kpiData = [], recentActivities = [], topClients = [], unitsStatusData = [] } = data || {};
+  const { 
+  kpiData = [], 
+  recentActivities = [], 
+  topClients = [], 
+  unitsStatusData = [],
+  revenueData = [] 
+} = data || {};
 
   return (
     <div className="space-y-6">
@@ -168,15 +175,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Revenue Chart Placeholder */}
         <div className="lg:col-span-2 bg-slate-100 p-6 rounded-xl shadow-xl">
-          <h3 className="font-semibold text-lg">Revenue & Bookings Trend</h3>
-          <p className="text-sm text-slate-500 mb-4">Last 6 months performance</p>
-          <div className="h-48 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 text-sm">
-            Chart component can be added here using recharts/chart.js
-          </div>
-        </div>
-      </div>
+  <h3 className="font-semibold text-lg">Revenue & Bookings Trend</h3>
+  <p className="text-sm text-slate-500 mb-4">Last 6 months performance</p>
+  <TrendChart data={revenueData} />
+</div>
+</div>
 
       {/* BOTTOM SECTION */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

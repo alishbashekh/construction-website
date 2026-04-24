@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { Outlet } from "react-router-dom"; // ← add this
+import { Outlet, useNavigate } from "react-router-dom"; // ← add this
 import Header from "../components/common/Header";
 import Sidebar from "../components/common/Sidebar";
+import { useAuth } from "../context/AuthContext";
 
 const DashboardLayout = () => {  // ← remove { children }
    const [open, setOpen] = useState(false);
+     const { logout, user } = useAuth(); 
+     const navigate = useNavigate();  
 
    const handleLogout = () => {
-    localStorage.removeItem("ottoman_token");
-    localStorage.removeItem("ottoman_user");
-    window.location.href = "/login";
+      logout();
+     navigate("/login", { replace: true }); 
   };
-
-  const user = JSON.parse(localStorage.getItem("ottoman_user"));
 
   return (
     <div className="flex min-h-screen">

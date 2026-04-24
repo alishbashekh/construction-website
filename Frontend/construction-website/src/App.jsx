@@ -1,5 +1,5 @@
 import React from "react";
-import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute, PublicRoute } from "./components/common/RouteGuards";
 import LoginPage from "./pages/auth/LoginPage";
@@ -20,12 +20,9 @@ import ClientLedger from "./pages/reports/ClientLedger";
 
 const App = () => {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Redirect root to login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-
           {/* Public Routes */}
           <Route
             path="/login"
@@ -45,6 +42,9 @@ const App = () => {
               </ProtectedRoute>
             }
           >
+            {/* Redirect root → dashboard */}
+            <Route index element={<Navigate to="/dashboard" replace />} />
+
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="users" element={<UserPage />} />
             <Route path="logs" element={<LogsPage />} />
@@ -56,23 +56,17 @@ const App = () => {
 
             {/* Reports */}
             <Route path="reports/sales-summary" element={<SalesSummary />} />
-            <Route
-              path="reports/flats-availability"
-              element={<FlatsAvailability />}
-            />
+            <Route path="reports/flats-availability" element={<FlatsAvailability />} />
             <Route path="reports/client-dues" element={<ClientDues />} />
-            <Route
-              path="reports/payment-collection"
-              element={<PaymentCollection />}
-            />
+            <Route path="reports/payment-collection" element={<PaymentCollection />} />
             <Route path="reports/client-ledger" element={<ClientLedger />} />
           </Route>
 
-          {/* Catch-all redirect */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </AuthProvider>
-    </HashRouter>
+    </BrowserRouter>
   );
 };
 

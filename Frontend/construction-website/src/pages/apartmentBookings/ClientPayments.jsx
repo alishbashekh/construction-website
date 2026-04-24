@@ -45,13 +45,11 @@ function ModeBadge({ value }) {
 
 const COLUMNS = [
   { key: "receiptNumber", label: "Receipt #",    sortable: true },
-  { key: "booking",       label: "Booking #",    sortable: true, render: (v) => v?.bookingNumber || "-" },
-  { key: "project",       label: "Project",      sortable: true, render: (v) => v?.name || "-" },
   { key: "flat",          label: "Unit",         sortable: true, render: (v) => v?.flatNumber || "-" },
   { key: "client",        label: "Client",       sortable: true, render: (v) => v?.name || "-" },
   { key: "type",          label: "Type",         sortable: true, render: (v) => <TypeBadge value={v} /> },
   { key: "paymentMode",   label: "Mode",         sortable: true, render: (v) => <ModeBadge value={v} /> },
-  { key: "receiptNumber", label: "Receipt",      sortable: false },
+ ,
   {
     key: "paymentDate",
     label: "Date",
