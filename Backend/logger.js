@@ -1,5 +1,7 @@
 import winston from 'winston';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -8,17 +10,19 @@ const logger = winston.createLogger({
     )
   ),
   transports: [
-    // Print logs in terminal
+    // Print logs in terminal — works everywhere ✅
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.simple()
       )
     }),
-    // Save error logs to file
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    // Save all logs to file
-    new winston.transports.File({ filename: 'logs/app.log' })
+
+    // File logs only in local development — Vercel is read-only ✅
+    ...(!isProduction ? [
+      new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+      new winston.transports.File({ filename: 'logs/app.log' })
+    ] : [])
   ]
 });
 
