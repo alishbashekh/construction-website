@@ -14,12 +14,12 @@ const app = express();
 const PORT = process.env.PORT || 2000;
 
 // ─── Middleware ───────────────────────────────────────────
-app.use(helmet());                          // Security headers
-app.use(cors({ origin: '*' }));             // Allow all origins
-app.use(morgan('dev'));                     // Log requests in terminal
-app.use(express.json());                   // Parse JSON body
-app.use(express.urlencoded({ extended: true })); // Parse form data
-app.use('/uploads', express.static('uploads')); // Serve uploaded files
+app.use(helmet());
+app.use(cors({ origin: '*' }));
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static('uploads'));
 
 // ─── Routes ──────────────────────────────────────────────
 app.get('/', (req, res) => {
@@ -40,15 +40,17 @@ app.use((req, res) => {
 // ─── Error Handler ────────────────────────────────────────
 app.use(ErrorHandler);
 
-// ─── Start Server ─────────────────────────────────────────
+// ─── Connect DB then start (local only) ──────────────────
 const startServer = async () => {
   try {
     await connectDB();
     logger.info('Database connected');
 
-    app.listen(PORT, () => {
-      logger.info(`Server running on http://localhost:${PORT}/api/v1`);
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    }
   } catch (error) {
     logger.error('Failed to start server:', error);
     process.exit(1);
@@ -56,3 +58,6 @@ const startServer = async () => {
 };
 
 startServer();
+
+
+export default app;
