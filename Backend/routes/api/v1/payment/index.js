@@ -1,5 +1,5 @@
 import { Router } from "express";
-import PaymentController from "../../../../controllers/payment/paymentController.js";
+import PaymentController from "../../../../controllers/Payment/paymentController.js";
 import isUser from "../../../../middlewares/isUser.js";
 import checkRole from "../../../../middlewares/checkRole.js";
 

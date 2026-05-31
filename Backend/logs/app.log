@@ -204,3 +204,5 @@
 [2026-05-31 15:17:31] INFO: MongoDB connected: ac-rsbwybx-shard-00-00.cbxaw7n.mongodb.net
 [2026-05-31 15:17:31] INFO: Database connected
 [2026-05-31 15:17:31] INFO: Server running on http://localhost:3000/api/v1
+[2026-05-31 15:32:02] INFO: MongoDB connected: ac-rsbwybx-shard-00-00.cbxaw7n.mongodb.net
+[2026-05-31 15:32:02] INFO: Database connected

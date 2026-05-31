@@ -1,7 +1,7 @@
 import { Router } from "express";
-import VendorController from "../../../../controllers/vendor/vendorController.js";
-import VendorProjectController from "../../../../controllers/vendor/vendorProjectController.js";
-import VendorPaymentController from "../../../../controllers/vendor/vendorPaymentController.js";
+import VendorController from "../../../../controllers/Vendor/vendorController.js";
+import VendorProjectController from "../../../../controllers/Vendor/vendorProjectController.js";
+import VendorPaymentController from "../../../../controllers/Vendor/vendorPaymentController.js";
 import isUser from "../../../../middlewares/isUser.js";
 import checkRole from "../../../../middlewares/checkRole.js";
 

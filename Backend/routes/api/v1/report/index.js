@@ -1,5 +1,5 @@
 import { Router } from "express";
-import ReportController from "../../../../controllers/report/reportController.js";
+import ReportController from "../../../../controllers/Report/reportController.js";
 import isUser from "../../../../middlewares/isUser.js";
 import checkRole from "../../../../middlewares/checkRole.js";
 
